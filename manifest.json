@@ -1,0 +1,39 @@
+{
+    "name": "phpMyAdmin",
+    "id": "phpmyadmin",
+    "description": {
+        "en": "Manage MySQL databases over the web"
+    },
+    "developer": {
+        "name": "julien",
+        "email": "julien.malik@paraiso.me",
+        "url": "http://www.phpmyadmin.net"
+    },
+    "multi_instance": "false",
+    "arguments": {
+        "install" : [
+            {
+                "name": "domain",
+                "ask": {
+                    "en": "Choose a domain for phpMyAdmin"
+                },
+                "example": "domain.org"
+            },
+            {
+                "name": "path",
+                "ask": {
+                    "en": "Choose a path for phpMyAdmin"
+                },
+                "example": "/phpmyadmin",
+                "default": "/phpmyadmin"
+            },
+            {
+                "name": "admin_user",
+                "ask": {
+                    "en": "Choose the only allowed admin user"
+                },
+                "example": "johndoe"
+            }
+        ]
+    }
+}
