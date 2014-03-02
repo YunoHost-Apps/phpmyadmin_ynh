@@ -18,33 +18,46 @@ if [[ ! $? -eq 0 ]]; then
     exit 1
 fi
 
+# Copy files to the right place
+version=$(cat upstream_version)
+final_path=/var/www/phpmyadmin
+sudo rm -rf $final_path
+sudo mkdir -p $final_path
+echo "Downloading phpMyAdmin $version..."
+sudo wget -O ../phpMyAdmin.tar.gz http://sourceforge.net/projects/phpmyadmin/files/phpMyAdmin/$version/phpMyAdmin-$version-all-languages.tar.gz/download > /dev/null 2>&1
+echo "Extracting to $final_path..."
+sudo tar xvzf ../phpMyAdmin.tar.gz -C ..  > /dev/null 2>&1
+sudo cp  -r ../phpMyAdmin-$version-all-languages/* $final_path
+
+# Create db
+echo "Setting up database..."
 db_user=phpmyadmin
 db_pwd=$(dd if=/dev/urandom bs=1 count=200 2> /dev/null | tr -c -d 'A-Za-z0-9' | sed -n 's/\(.\{24\}\).*/\1/p')
 sed -i "s@YNH_PMA_USER@$db_user@g" ../conf/create_db.sql
 sudo yunohost app initdb $db_user -p $db_pwd
 mysql -u root -p$(sudo cat /etc/yunohost/mysql) < ../conf/create_db.sql
 mysql -u $db_user -p$db_pwd < ../conf/create_tables.sql
-#mysql -u root -p$(sudo cat /etc/yunohost/mysql) < ../conf/create_tables.sql
+# mysql -u root -p$(sudo cat /etc/yunohost/mysql) < ../conf/create_tables.sql
 sudo yunohost app setting phpmyadmin mysqlpwd -v $db_pwd
 
-final_path=/var/www/phpmyadmin
-
-# Copy files to the right place
-sudo mkdir -p $final_path
-sudo cp -r ../sources/* $final_path
+# Configuration
+echo "Configuring application..."
 sed -i "s@YNH_DOMAIN@$domain@g" ../conf/config.inc.php
 sed -i "s@YNH_ADMIN_USER@$admin_user@g" ../conf/config.inc.php
 sed -i "s@YNH_PMA_USER@$db_user@g" ../conf/config.inc.php
 sed -i "s@YNH_PMA_PASSWORD@$db_pwd@g" ../conf/config.inc.php
 sed -i "s@YNH_MYSQL_ROOT_PASSWORD@$(sudo cat /etc/yunohost/mysql)@g" ../conf/config.inc.php
 sudo cp ../conf/config.inc.php $final_path
+sudo yunohost app setting phpmyadmin admin_user -v $admin_user
 
 # Files owned by root, www-data can just read
+echo "Setting permission..."
 sudo chown -R root: $final_path
 sudo find $final_path -type f | xargs sudo chmod 644
 sudo find $final_path -type d | xargs sudo chmod 755
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
+echo "Setting up nginx configuration..."
 sed -i "s@YNH_WWW_PATH@$path@g" ../conf/nginx.conf
 sed -i "s@YNH_WWW_ALIAS@$final_path/@g" ../conf/nginx.conf
 nginxconf=/etc/nginx/conf.d/$domain.d/phpmyadmin.conf
