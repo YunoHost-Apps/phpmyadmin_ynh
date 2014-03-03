@@ -10,13 +10,6 @@
  * @package PhpMyAdmin
  */
 
-$ynh_admin_user = 'YNH_ADMIN_USER';
-if ($_SERVER['PHP_AUTH_USER'] != $ynh_admin_user)
-{
-  header('Location: https://YNH_DOMAIN/ynhsso');
-  exit;
-}
-
 /*
  * This is needed for cookie based authentication to encrypt password in
  * cookie

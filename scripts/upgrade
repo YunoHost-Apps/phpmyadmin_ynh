@@ -27,11 +27,13 @@ db_pwd=$(sudo yunohost app setting phpmyadmin mysqlpwd)
 # Configuration
 echo "Configuring application..."
 sed -i "s@YNH_DOMAIN@$domain@g" ../conf/config.inc.php
-sed -i "s@YNH_ADMIN_USER@$admin_user@g" ../conf/config.inc.php
 sed -i "s@YNH_PMA_USER@$db_user@g" ../conf/config.inc.php
 sed -i "s@YNH_PMA_PASSWORD@$db_pwd@g" ../conf/config.inc.php
 sed -i "s@YNH_MYSQL_ROOT_PASSWORD@$(sudo cat /etc/yunohost/mysql)@g" ../conf/config.inc.php
 sudo cp ../conf/config.inc.php $final_path
+
+sudo yunohost app addaccess phpmyadmin -u $admin_user
+sudo yunohost app setting phpmyadmin admin_user -v $admin_user
 
 # Files owned by root, www-data can just read
 echo "Setting permission..."
