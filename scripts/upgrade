@@ -8,6 +8,13 @@ admin=$(sudo yunohost app setting phpmyadmin admin)
 # Remove trailing "/" for next commands
 path=${path%/}
 
+# In older version, the admin setting was admin_user
+if [[ -z "$admin" ]]; then
+  admin=$(sudo yunohost app setting phpmyadmin admin_user)
+  sudo yunohost app setting phpmyadmin admin_user -d
+  sudo yunohost app setting phpmyadmin admin -v $admin
+fi
+
 # Copy files to the right place
 final_path=/var/www/phpmyadmin
 version=$(cat upstream_version)
