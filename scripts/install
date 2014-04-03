@@ -3,7 +3,7 @@
 # Retrieve arguments
 domain=$1
 path=$2
-admin_user=$3
+admin=$3
 
 # Check domain/path availability
 sudo yunohost app checkurl $domain$path -a phpmyadmin
@@ -12,7 +12,7 @@ if [[ ! $? -eq 0 ]]; then
 fi
 
 # Check that admin user is an existing account
-sudo yunohost user list | python ../conf/user_list.py | grep "^$admin_user$" >/dev/null
+sudo yunohost user list | python ../conf/user_list.py | grep "^$admin$" >/dev/null
 if [[ ! $? -eq 0 ]]; then
     echo "Error : the chosen admin user does not exist"
     exit 1
@@ -48,8 +48,8 @@ sed -i "s@YNH_PMA_PASSWORD@$db_pwd@g" ../conf/config.inc.php
 sed -i "s@YNH_MYSQL_ROOT_PASSWORD@$(sudo cat /etc/yunohost/mysql)@g" ../conf/config.inc.php
 sudo cp ../conf/config.inc.php $final_path
 
-sudo yunohost app addaccess phpmyadmin -u $admin_user
-sudo yunohost app setting phpmyadmin admin_user -v $admin_user
+sudo yunohost app addaccess phpmyadmin -u $admin
+sudo yunohost app setting phpmyadmin admin -v $admin
 
 # Files owned by root, www-data can just read
 echo "Setting permission..."

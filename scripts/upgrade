@@ -3,7 +3,7 @@
 # Retrieve arguments
 domain=$(sudo yunohost app setting phpmyadmin domain)
 path=$(sudo yunohost app setting phpmyadmin path)
-admin_user=$(sudo yunohost app setting phpmyadmin admin_user)
+admin=$(sudo yunohost app setting phpmyadmin admin)
 
 # Remove trailing "/" for next commands
 path=${path%/}
@@ -32,8 +32,8 @@ sed -i "s@YNH_PMA_PASSWORD@$db_pwd@g" ../conf/config.inc.php
 sed -i "s@YNH_MYSQL_ROOT_PASSWORD@$(sudo cat /etc/yunohost/mysql)@g" ../conf/config.inc.php
 sudo cp ../conf/config.inc.php $final_path
 
-sudo yunohost app addaccess phpmyadmin -u $admin_user
-sudo yunohost app setting phpmyadmin admin_user -v $admin_user
+sudo yunohost app addaccess phpmyadmin -u $admin
+sudo yunohost app setting phpmyadmin admin -v $admin
 
 # Files owned by root, www-data can just read
 echo "Setting permission..."
