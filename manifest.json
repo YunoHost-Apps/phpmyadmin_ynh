@@ -28,7 +28,7 @@
                 "default": "/phpmyadmin"
             },
             {
-                "name": "admin_user",
+                "name": "admin",
                 "ask": {
                     "en": "Choose the only allowed admin user"
                 },
