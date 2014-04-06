@@ -2,8 +2,8 @@
     "name": "phpMyAdmin",
     "id": "phpmyadmin",
     "description": {
-        "en": "Manage MySQL databases over the web"
-        "fr": "Système web de gestion de base de données MySQL"
+        "en": "Manage MySQL databases over the web",
+        "fr": "Application web de gestion des bases de données MySQL"
     },
     "developer": {
         "name": "julien",
@@ -16,14 +16,16 @@
             {
                 "name": "domain",
                 "ask": {
-                    "en": "Choose a domain for phpMyAdmin"
+                    "en": "Choose a domain for phpMyAdmin",
+                    "fr": "Choisissez un domaine pour phpMyAdmin"
                 },
                 "example": "domain.org"
             },
             {
                 "name": "path",
                 "ask": {
-                    "en": "Choose a path for phpMyAdmin"
+                    "en": "Choose a path for phpMyAdmin",
+                    "fr": "Choisissez un chemin pour phpMyAdmin"
                 },
                 "example": "/phpmyadmin",
                 "default": "/phpmyadmin"
@@ -31,7 +33,8 @@
             {
                 "name": "admin",
                 "ask": {
-                    "en": "Choose the only allowed admin user"
+                    "en": "Choose the only allowed admin user",
+                    "fr": "Choisissez l'unique utilisateur autorisé"
                 },
                 "example": "johndoe"
             }
