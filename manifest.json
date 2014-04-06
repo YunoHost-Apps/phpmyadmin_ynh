@@ -3,6 +3,7 @@
     "id": "phpmyadmin",
     "description": {
         "en": "Manage MySQL databases over the web"
+        "fr": "Système web de gestion de base de données MySQL"
     },
     "developer": {
         "name": "julien",
