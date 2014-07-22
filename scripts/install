@@ -56,6 +56,9 @@ echo "Setting permission..."
 sudo chown -R root: $final_path
 sudo find $final_path -type f | xargs sudo chmod 644
 sudo find $final_path -type d | xargs sudo chmod 755
+# config.inc.php contains sensitive data, restrict its access
+sudo chown root:www-data $final_path/config.inc.php
+sudo chmod 640 $final_path/config.inc.php
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
 echo "Setting up nginx configuration..."
