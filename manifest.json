@@ -5,6 +5,7 @@
         "en": "Manage MySQL databases over the web",
         "fr": "Application web de gestion des bases de données MySQL"
     },
+    "licence": "GNU GPL",
     "developer": {
         "name": "julien",
         "email": "julien.malik@paraiso.me",
