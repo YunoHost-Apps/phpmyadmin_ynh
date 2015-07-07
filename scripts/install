@@ -70,5 +70,13 @@ sudo cp ../conf/nginx.conf $nginxconf
 sudo chown root: $nginxconf
 sudo chmod 600 $nginxconf
 
+# Add dedicated php-fpm to be able to upload bigger database
+sed -i "s@NAMETOCHANGE@phpmyadmin@g" ../conf/php-fpm.conf
+phpfpmconf=/etc/php5/fpm/pool.d/phpmyadmin.conf
+sudo cp ../conf/php-fpm.conf $phpfpmconf
+sudo chown root: $phpfpmconf
+sudo chmod 644 $phpfpmconf
+
+sudo service php5-fpm restart
 sudo service nginx reload
 sudo yunohost app ssowatconf
