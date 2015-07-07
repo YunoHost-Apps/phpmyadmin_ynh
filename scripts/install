@@ -19,7 +19,7 @@ if [[ ! $? -eq 0 ]]; then
 fi
 
 # Copy files to the right place
-version=$(cat upstream_version)
+version=$(cat ../conf/upstream_version)
 final_path=/var/www/phpmyadmin
 sudo rm -rf $final_path
 sudo mkdir -p $final_path

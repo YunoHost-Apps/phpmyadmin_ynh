@@ -17,7 +17,7 @@ fi
 
 # Copy files to the right place
 final_path=/var/www/phpmyadmin
-version=$(cat upstream_version)
+version=$(cat ../conf/upstream_version)
 sudo rm -rf $final_path
 sudo mkdir -p $final_path
 echo "Downloading phpMyAdmin $version..."
