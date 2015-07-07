@@ -24,7 +24,7 @@ final_path=/var/www/phpmyadmin
 sudo rm -rf $final_path
 sudo mkdir -p $final_path
 echo "Downloading phpMyAdmin $version..."
-sudo wget -O ../phpMyAdmin.tar.gz http://sourceforge.net/projects/phpmyadmin/files/phpMyAdmin/$version/phpMyAdmin-$version-all-languages.tar.gz/download > /dev/null 2>&1
+sudo wget -O ../phpMyAdmin.tar.gz https://files.phpmyadmin.net/phpMyAdmin/$version/phpMyAdmin-$version-all-languages.tar.gz > /dev/null 2>&1
 echo "Extracting to $final_path..."
 sudo tar xvzf ../phpMyAdmin.tar.gz -C ..  > /dev/null 2>&1
 sudo cp  -r ../phpMyAdmin-$version-all-languages/* $final_path
@@ -70,5 +70,13 @@ sudo cp ../conf/nginx.conf $nginxconf
 sudo chown root: $nginxconf
 sudo chmod 600 $nginxconf
 
+# Add dedicated php-fpm to be able to upload bigger database
+sed -i "s@NAMETOCHANGE@phpmyadmin@g" ../conf/php-fpm.conf
+phpfpmconf=/etc/php5/fpm/pool.d/phpmyadmin.conf
+sudo cp ../conf/php-fpm.conf $phpfpmconf
+sudo chown root: $phpfpmconf
+sudo chmod 644 $phpfpmconf
+
+sudo service php5-fpm restart
 sudo service nginx reload
 sudo yunohost app ssowatconf
