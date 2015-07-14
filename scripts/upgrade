@@ -59,6 +59,7 @@ sudo chmod 640 $final_path/config.inc.php
 echo "Setting up nginx configuration..."
 sed -i "s@YNH_WWW_PATH@$path@g" ../conf/nginx.conf
 sed -i "s@YNH_WWW_ALIAS@$final_path/@g" ../conf/nginx.conf
+sed -i "s@NAMETOCHANGE@phpmyadmin@g" ../conf/nginx.conf
 nginxconf=/etc/nginx/conf.d/$domain.d/phpmyadmin.conf
 sudo cp ../conf/nginx.conf $nginxconf
 sudo chown root: $nginxconf
