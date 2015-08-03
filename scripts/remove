@@ -4,7 +4,9 @@ domain=$(sudo yunohost app setting phpmyadmin domain)
 
 sudo rm -rf /var/www/phpmyadmin
 sudo rm -f /etc/nginx/conf.d/$domain.d/phpmyadmin.conf
+sudo rm -f /etc/php5/fpm/pool.d/phpmyadmin.conf
 
+sudo service php5-fpm restart
 sudo service nginx reload
 
 db_user=phpmyadmin
