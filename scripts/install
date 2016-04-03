@@ -53,8 +53,8 @@ sudo yunohost app setting phpmyadmin admin -v $admin
 # Files owned by root, www-data can just read
 echo "Setting permission..."
 sudo chown -R root: $final_path
-sudo find $final_path -type f | xargs sudo chmod 644
-sudo find $final_path -type d | xargs sudo chmod 755
+sudo find $final_path -type f -exec chmod 644 {} \;
+sudo find $final_path -type d -exec chmod 755 {} \;
 # config.inc.php contains sensitive data, restrict its access
 sudo chown root:www-data $final_path/config.inc.php
 sudo chmod 640 $final_path/config.inc.php
