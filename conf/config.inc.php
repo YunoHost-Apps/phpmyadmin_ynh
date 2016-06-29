@@ -14,7 +14,12 @@
  * This is needed for cookie based authentication to encrypt password in
  * cookie
  */
-$cfg['blowfish_secret'] = 'YNH_COOKIE_PASSWD'; /* YOU MUST FILL IN THIS FOR COOKIE AUTH! */
+/* [YunoHost]
+ * We use the 'config' auth mode, so we don't care about settings
+ * specific to the 'cookie' auth mode
+ */
+$cfg['blowfish_secret'] = 'NOT_USED';
+
 
 /*
  * Servers configuration
@@ -72,6 +77,10 @@ $cfg['Servers'][$i]['savedsearches'] = 'pma__savedsearches';
 $cfg['Servers'][$i]['favorite'] = 'pma__favorite';
 $cfg['Servers'][$i]['central_columns'] = 'pma__central_columns';
 $cfg['Servers'][$i]['tracking'] = 'pma__tracking';
+
+// 4.5.3.1 update
+$cfg['Servers'][$i]['designer_settings'] = 'pma__designer_settings';
+$cfg['Servers'][$i]['export_templates'] = 'pma__export_templates';
 
 /* Contrib / Swekey authentication */
 // $cfg['Servers'][$i]['auth_swekey_config'] = '/etc/swekey-pma.conf';

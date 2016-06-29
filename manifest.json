@@ -1,6 +1,7 @@
 {
     "name": "phpMyAdmin",
     "id": "phpmyadmin",
+    "packaging_format": 1,
     "description": {
         "en": "Manage MySQL databases over the web",
         "fr": "Application web de gestion des bases de données MySQL"
@@ -11,6 +12,11 @@
         "email": "julien.malik@paraiso.me"
     },
     "multi_instance": "false",
+    "services": [
+        "nginx",
+        "php5-fpm",
+        "mysql"
+    ],
     "arguments": {
         "install" : [
             {
