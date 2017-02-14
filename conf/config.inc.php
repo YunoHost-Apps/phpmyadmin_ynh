@@ -57,7 +57,7 @@ $cfg['Servers'][$i]['controluser'] = 'YNH_PMA_USER';
 $cfg['Servers'][$i]['controlpass'] = 'YNH_PMA_PASSWORD';
 
 /* Storage database and tables */
-$cfg['Servers'][$i]['pmadb'] = 'phpmyadmin';
+$cfg['Servers'][$i]['pmadb'] = 'YNH_PMA_USER';
 $cfg['Servers'][$i]['bookmarktable'] = 'pma__bookmark';
 $cfg['Servers'][$i]['relation'] = 'pma__relation';
 $cfg['Servers'][$i]['table_info'] = 'pma__table_info';

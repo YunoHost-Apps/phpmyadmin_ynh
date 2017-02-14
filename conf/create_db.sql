@@ -14,14 +14,14 @@
 
 -- --------------------------------------------------------
 
-DROP DATABASE `phpmyadmin`;
+DROP DATABASE `YNH_PMA_USER`;
 
 -- 
--- Database : `phpmyadmin`
+-- Database : `YNH_PMA_USER`
 -- 
-CREATE DATABASE IF NOT EXISTS `phpmyadmin`
+CREATE DATABASE IF NOT EXISTS `YNH_PMA_USER`
   DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
-USE phpmyadmin;
+USE YNH_PMA_USER;
 
-GRANT SELECT, INSERT, DELETE, UPDATE ON `phpmyadmin`.* TO
+GRANT SELECT, INSERT, DELETE, UPDATE ON `YNH_PMA_USER`.* TO
    'YNH_PMA_USER'@localhost;
