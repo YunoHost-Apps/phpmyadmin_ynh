@@ -10,6 +10,7 @@ source /usr/share/yunohost/helpers
 
 domain=$(ynh_app_setting_get $app domain)
 path=$(ynh_app_setting_get $app path)
+admin=$(ynh_app_setting_get $app admin)
 final_path=$(ynh_app_setting_get $app final_path)
 db_pwd=$(ynh_app_setting_get $app db_pwd)
 db_user=$(ynh_app_setting_get $app db_user)
