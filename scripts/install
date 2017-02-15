@@ -39,7 +39,7 @@ ynh_app_setting_set $app admin $admin
 
 # Copy files to the right place
 version=$(cat ../conf/upstream_version)
-sudo wget -O https://files.phpmyadmin.net/phpMyAdmin/$version/phpMyAdmin-$version-all-languages.tar.gz -O ../phpMyAdmin.tar.gz
+sudo wget -nv https://files.phpmyadmin.net/phpMyAdmin/$version/phpMyAdmin-$version-all-languages.tar.gz -O ../phpMyAdmin.tar.gz
 #sudo tar xvzf ../phpMyAdmin.tar.gz -C ..  > /dev/null 2>&1
 sudo tar xvzf ../phpMyAdmin.tar.gz -C ..  > /dev/null 2>&1
 sudo cp  -r ../phpMyAdmin-$version-all-languages/* $final_path
