@@ -58,7 +58,7 @@ CHECK_VAR "$db_pwd" "db_pwd empty"
 ynh_mysql_create_db "$db_user" "$db_user" $db_pwd
 ynh_app_setting_set $app db_pwd $db_pwd
 ynh_app_setting_set $app db_user $db_user
-sed -i "s@YNH_PMA_USER@$db_user@g" ../conf/config.php.inc
+sed -i "s@YNH_PMA_USER@$db_user@g" ../conf/config.inc.php
 sudo mysql -u root -p$(sudo cat /etc/yunohost/mysql) < ../conf/create_db.sql
 sudo mysql -u $db_user -p$db_pwd < $final_path/sql/create_tables.sql
 
