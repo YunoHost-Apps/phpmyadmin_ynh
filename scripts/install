@@ -60,8 +60,8 @@ ynh_app_setting_set $app db_pwd $db_pwd
 ynh_app_setting_set $app db_user $db_user
 sed -i "s@YNH_PMA_USER@$db_user@g" ../conf/create_db.sql
 sudo mysql -u root -p$(sudo cat /etc/yunohost/mysql) < ../conf/create_db.sql
-sed -i "s@phpmyadmin@YNH_PMA_USER@g" $final_path/sql/create_tables.sql
-sed -i "s@YNH_PMA_USER@$db_user@g" $final_path/sql/create_tables.sql
+sudo sed -i "s@phpmyadmin@YNH_PMA_USER@g" $final_path/sql/create_tables.sql
+sudo sed -i "s@YNH_PMA_USER@$db_user@g" $final_path/sql/create_tables.sql
 sudo mysql -u $db_user -p$db_pwd < $final_path/sql/create_tables.sql
 
 # Configuration

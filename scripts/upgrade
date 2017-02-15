@@ -24,12 +24,12 @@ sudo tar xvzf ../phpMyAdmin.tar.gz -C ..  > /dev/null 2>&1
 sudo cp  -r ../phpMyAdmin-$version-all-languages/* $final_path
 
 # Update tables
-sed -i "s@phpmyadmin@YNH_PMA_USER@g" $final_path/sql/upgrade_column_info_4_3_0+.sql
-sed -i "s@YNH_PMA_USER@$db_user@g" $final_path/sql/upgrade_column_info_4_3_0+.sql
-mysql -u $db_user -p$db_pwd < $final_path/sql/upgrade_column_info_4_3_0+.sql
-sed -i "s@phpmyadmin@YNH_PMA_USER@g" $final_path/sql/create_tables.sql
-sed -i "s@YNH_PMA_USER@$db_user@g" $final_path/sql/create_tables.sql
-mysql -u $db_user -p$db_pwd < $final_path/sql/create_tables.sql
+sudo sed -i "s@phpmyadmin@YNH_PMA_USER@g" $final_path/sql/upgrade_column_info_4_3_0+.sql
+sudo sed -i "s@YNH_PMA_USER@$db_user@g" $final_path/sql/upgrade_column_info_4_3_0+.sql
+sudo mysql -u $db_user -p$db_pwd < $final_path/sql/upgrade_column_info_4_3_0+.sql
+sudo sed -i "s@phpmyadmin@YNH_PMA_USER@g" $final_path/sql/create_tables.sql
+sudo sed -i "s@YNH_PMA_USER@$db_user@g" $final_path/sql/create_tables.sql
+sudo mysql -u $db_user -p$db_pwd < $final_path/sql/create_tables.sql
 
 # Configuration
 echo "Configuring application..."
