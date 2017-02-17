@@ -2,11 +2,6 @@
 
 source .fonctions       # Charge les fonctions génériques habituellement utilisées dans le script
 
-CLEAN_SETUP () {
-# Nettoyage des résidus d'installation non pris en charge par le script remove.
-# Pas de nettoyage supplémentaire nécessaire ici...
-        echo ""
-}
 TRAP_ON # Active trap pour arrêter le script si une erreur est détectée.
 
 # Retrieve arguments
@@ -46,12 +41,9 @@ sudo tar xzf phpMyAdmin-$version-all-languages.tar.gz -C ../sources/  > /dev/nul
 sudo cp  -r ../sources/phpMyAdmin-$version-all-languages/* $final_path
 
 # Create db
-#GENERATE_DB $app        # Créer une base de données et un utilisateur dédié au nom de l'app.
-#Password is stored like that in the GENERATE_DB function : ynh_app_setting_set $app mysqlpwd $db_pwd
 db_user=$app
 db_user=${db_user//-/_} # mariadb ne supporte pas les - dans les noms de base de données. Ils sont donc remplacé par des _
 # Génère un mot de passe aléatoire.
-#       db_pwd=$(head -n20 /dev/urandom | tr -c -d 'A-Za-z0-9' | head -c20)
 db_pwd=$(ynh_string_random)
 CHECK_VAR "$db_pwd" "db_pwd empty"
 # Utilise '$app' comme nom d'utilisateur et de base de donnée
