@@ -90,7 +90,7 @@ sed -i "s@NAMETOCHANGE@$app@g" ../conf/nginx.conf
 nginxconf=/etc/nginx/conf.d/$domain.d/$app.conf
 sudo cp ../conf/nginx.conf $nginxconf
 sudo chown root: $nginxconf
-sudo chmod 600 $nginxconf
+sudo chmod 644 $nginxconf
 
 # Add dedicated php-fpm to be able to upload bigger database
 sed -i "s@NAMETOCHANGE@$app@g" ../conf/php-fpm.conf
