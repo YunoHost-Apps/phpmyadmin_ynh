@@ -46,15 +46,12 @@ db_user=${db_user//-/_} # mariadb ne supporte pas les - dans les noms de base de
 # Génère un mot de passe aléatoire.
 db_pwd=$(ynh_string_random)
 CHECK_VAR "$db_pwd" "db_pwd empty"
-# Utilise '$app' comme nom d'utilisateur et de base de donnée
-# Initialise la base de donnée et stocke le mot de passe mysql.
 ynh_mysql_create_db "$db_user" "$db_user" $db_pwd
 ynh_app_setting_set $app mysqlpwd $db_pwd
 ynh_app_setting_set $app db_user $db_user
 sed -i "s@YNH_PMA_USER@$db_user@g" ../conf/create_db.sql
 sudo mysql -u root -p$(sudo cat /etc/yunohost/mysql) < ../conf/create_db.sql
 sudo sed -i "s@phpmyadmin@$db_user@g" $final_path/sql/create_tables.sql
-#sudo sed -i "s@YNH_PMA_USER@$db_user@g" $final_path/sql/create_tables.sql
 sudo mysql -u $db_user -p$db_pwd < $final_path/sql/create_tables.sql
 
 # Configuration
