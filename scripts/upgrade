@@ -23,7 +23,7 @@ sudo wget -nv https://files.phpmyadmin.net/phpMyAdmin/$version/phpMyAdmin-$versi
 sudo wget -nv https://files.phpmyadmin.net/phpMyAdmin/$version/phpMyAdmin-$version-all-languages.tar.gz.sha256 -O phpMyAdmin-$version-all-languages.tar.gz.sha256
 sudo sha256sum -c phpMyAdmin-$version-all-languages.tar.gz.sha256 --status || (echo "Corrupt source" >&2 && false)
 sudo tar xzf phpMyAdmin-$version-all-languages.tar.gz -C ../sources/  > /dev/null 2>&1
-sudo cp  -r ../sources/phpMyAdmin-$version-all-languages/* $final_path
+sudo cp  -r ../sources/phpMyAdmin-$version-all-languages/. $final_path
 
 # Update tables
 sudo sed -i "s@phpmyadmin@$db_user@g" $final_path/sql/upgrade_column_info_4_3_0+.sql
