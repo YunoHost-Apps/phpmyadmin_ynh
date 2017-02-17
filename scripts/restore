@@ -11,7 +11,7 @@ path=$(ynh_app_setting_get $app path)
 admin=$(ynh_app_setting_get $app admin)
 final_path=$(ynh_app_setting_get $app final_path)
 db_user=$(ynh_app_setting_get $app db_user)
-db_pwd=$(ynh_app_setting_get $app db_pwd)
+db_pwd=$(ynh_app_setting_get $app mysqlpwd)
 
 if [ -d $final_path ]; then
     echo "There is already a directory: $final_path " >&2

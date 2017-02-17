@@ -38,7 +38,7 @@ sudo wget -nv https://files.phpmyadmin.net/phpMyAdmin/$version/phpMyAdmin-$versi
 sudo wget -nv https://files.phpmyadmin.net/phpMyAdmin/$version/phpMyAdmin-$version-all-languages.tar.gz.sha256 -O phpMyAdmin-$version-all-languages.tar.gz.sha256
 sudo sha256sum -c phpMyAdmin-$version-all-languages.tar.gz.sha256 --status || (echo "Corrupt source" >&2 && false)
 sudo tar xzf phpMyAdmin-$version-all-languages.tar.gz -C ../sources/  > /dev/null 2>&1
-sudo cp  -r ../sources/phpMyAdmin-$version-all-languages/. $final_path
+sudo cp  -a ../sources/phpMyAdmin-$version-all-languages/. "$final_path"
 
 # Create db
 db_user=$app
@@ -49,7 +49,7 @@ CHECK_VAR "$db_pwd" "db_pwd empty"
 # Utilise '$app' comme nom d'utilisateur et de base de donnée
 # Initialise la base de donnée et stocke le mot de passe mysql.
 ynh_mysql_create_db "$db_user" "$db_user" $db_pwd
-ynh_app_setting_set $app db_pwd $db_pwd
+ynh_app_setting_set $app mysqlpwd $db_pwd
 ynh_app_setting_set $app db_user $db_user
 sed -i "s@YNH_PMA_USER@$db_user@g" ../conf/create_db.sql
 sudo mysql -u root -p$(sudo cat /etc/yunohost/mysql) < ../conf/create_db.sql

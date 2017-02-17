@@ -12,10 +12,36 @@ domain=$(ynh_app_setting_get $app domain)
 path=$(ynh_app_setting_get $app path)
 admin=$(ynh_app_setting_get $app admin)
 final_path=$(ynh_app_setting_get $app final_path)
-db_pwd=$(ynh_app_setting_get $app db_pwd)
+db_pwd=$(ynh_app_setting_get $app mysqlpwd)
 db_user=$(ynh_app_setting_get $app db_user)
 
 CHECK_PATH      # Vérifie et corrige la syntaxe du path.
+
+# We make the app retro-compatible with previous versions
+if [[ -z "$final_path" ]];
+then
+   final_path="/var/www/$app"
+   ynh_app_setting_set "$app" final_path "$final_path"
+else
+   echo "${final_path} exists, we don't create it."
+fi
+
+# In older version, db_user was always phpmyadmin
+if [[ -z "$db_user" ]];
+then
+   db_user="phpmyadmin"
+   ynh_app_setting_set "$app" db_user "$db_user"
+else
+   echo "${db_user} exists, we don't create it."
+fi
+
+# In older version, the admin setting was admin_user
+if [[ -z "$admin" ]]; then
+   admin=$(ynh_app_setting_get $app admin_user)
+   ynh_app_setting_set "$app" admin "$admin"
+   ynh_app_setting_delete $app admin_user
+fi
+
 
 # Copy files to the right place
 version=$(cat ../sources/upstream_version)
