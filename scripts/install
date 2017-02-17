@@ -102,6 +102,6 @@ sudo chmod 644 $phpfpmconf
 # We grant access to admin only
 sudo yunohost app addaccess --users=$admin $app
 
-sudo service php5-fpm restart
+sudo service php5-fpm reload
 sudo service nginx reload
 sudo yunohost app ssowatconf

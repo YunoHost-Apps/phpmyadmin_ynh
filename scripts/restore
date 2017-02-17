@@ -45,7 +45,7 @@ sudo cp -a $backup_dir/php-fpm.conf /etc/php5/fpm/pool.d/$app.conf
 sudo yunohost app addaccess --users=$admin $app
 
 # And Reload services
-sudo service php5-fpm restart
+sudo service php5-fpm reload
 sudo service nginx reload
 
 sudo yunohost app ssowatconf
