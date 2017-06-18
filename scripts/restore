@@ -15,14 +15,14 @@ db_pwd=$(ynh_app_setting_get $app mysqlpwd)
 
 if [ -d $final_path ]; then
     echo "There is already a directory: $final_path " >&2
-    exit 1
+    ynh_die
 fi
 
 # Restore Nginx
 conf=/etc/nginx/conf.d/$domain.d/$app.conf
 if [ -f $conf ]; then
     echo "There is already a nginx conf file at this path: $conf " >&2
-    exit 1
+    ynh_die
 fi
 sudo cp -a ./nginx.conf $conf
 
