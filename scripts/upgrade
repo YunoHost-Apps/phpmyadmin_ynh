@@ -1,107 +1,156 @@
 #!/bin/bash
-set -eu
 
-source .fonctions       # Charge les fonctions génériques habituellement utilisées dans le script
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-# Récupère les infos de l'application.
-app=$YNH_APP_INSTANCE_NAME
-
-# Source app helpers
+# source _common.sh
 source /usr/share/yunohost/helpers
 
+#=================================================
+# LOAD SETTINGS
+#=================================================
+
+app=$YNH_APP_INSTANCE_NAME
+
 domain=$(ynh_app_setting_get $app domain)
-path=$(ynh_app_setting_get $app path)
+path_url=$(ynh_app_setting_get $app path)
 admin=$(ynh_app_setting_get $app admin)
 final_path=$(ynh_app_setting_get $app final_path)
-db_pwd=$(ynh_app_setting_get $app mysqlpwd)
-db_user=$(ynh_app_setting_get $app db_user)
+db_name=$(ynh_app_setting_get $app db_name)
 
-CHECK_PATH      # Vérifie et corrige la syntaxe du path.
+#=================================================
+# ENSURE DOWNWARD COMPATIBILITY
+#=================================================
 
-# We make the app retro-compatible with previous versions
-if [[ -z "$final_path" ]];
-then
-   final_path="/var/www/$app"
-   ynh_app_setting_set "$app" final_path "$final_path"
-else
-   echo "${final_path} exists, we don't create it."
+# If db_name doesn't exist, create it
+if [ -z $db_name ]; then
+	# In older version, db_name was always phpmyadmin
+	db_name=phpmyadmin
+	ynh_app_setting_set $app db_name $db_name
 fi
 
-# In older version, db_user was always phpmyadmin
-if [[ -z "$db_user" ]];
-then
-   db_user="phpmyadmin"
-   ynh_app_setting_set "$app" db_user "$db_user"
-else
-   echo "${db_user} exists, we don't create it."
+# If final_path doesn't exist, create it
+if [ -z $final_path ]; then
+	final_path=$(ynh_sanitize_dbid $app)
+	ynh_app_setting_set $app final_path $final_path
 fi
 
 # In older version, the admin setting was admin_user
-if [[ -z "$admin" ]]; then
-   admin=$(ynh_app_setting_get $app admin_user)
-   ynh_app_setting_set "$app" admin "$admin"
-   ynh_app_setting_delete $app admin_user
+if [ -z $admin ]; then
+	admin=$(ynh_app_setting_get $app admin_user)
+	ynh_app_setting_set "$app" admin "$admin"
+	ynh_app_setting_delete $app admin_user
 fi
 
+#=================================================
+# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
+#=================================================
 
-# Copy files to the right place
-version=$(cat ../sources/upstream_version)
-sudo wget -nv https://files.phpmyadmin.net/phpMyAdmin/$version/phpMyAdmin-$version-all-languages.tar.gz -O phpMyAdmin-$version-all-languages.tar.gz
-sudo wget -nv https://files.phpmyadmin.net/phpMyAdmin/$version/phpMyAdmin-$version-all-languages.tar.gz.sha256 -O phpMyAdmin-$version-all-languages.tar.gz.sha256
-sudo sha256sum -c phpMyAdmin-$version-all-languages.tar.gz.sha256 --status || (echo "Corrupt source" >&2 && false)
-sudo tar xzf phpMyAdmin-$version-all-languages.tar.gz -C ../sources/  > /dev/null 2>&1
-sudo cp  -r ../sources/phpMyAdmin-$version-all-languages/. "$final_path"
+ynh_backup_before_upgrade	# Backup the current version of the app
+ynh_clean_setup () {
+	ynh_restore_upgradebackup	# restore it if the upgrade fails
+}
+ynh_abort_if_errors	# Exit if an error occurs during the execution of the script
 
-# Update tables
+#=================================================
+# CHECK THE PATH
+#=================================================
 
+# Normalize the URL path syntax
+path_url=$(ynh_normalize_url_path $path_url)
+
+#=================================================
+# STANDARD UPGRADE STEPS
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source "$final_path"
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+
+# Create a dedicated nginx config
+ynh_add_nginx_config
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+
+# Create a system user
+ynh_system_user_create $app
+
+#=================================================
+# PHP-FPM CONFIGURATION
+#=================================================
+
+# Create a dedicated php-fpm config
+ynh_add_fpm_config
+
+#=================================================
+# SPECIFIC UPGRADE
+#=================================================
+# UPGRADE THE DATABASE
+#=================================================
+
+db_pwd=$(ynh_app_setting_get $app mysqlpwd)
 # Handle upgrade from a version before latest version
 # Ignore warnings and failures that will occur if already on latest version
-sudo sed -i "s@phpmyadmin@$db_user@g" $final_path/sql/upgrade_column_info_4_3_0+.sql
-sudo mysql -u $db_user -p$db_pwd < $final_path/sql/upgrade_column_info_4_3_0+.sql 2>&1 > /dev/null || true
+ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/upgrade_column_info_4_3_0+.sql
+ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
+    < $final_path/sql/upgrade_column_info_4_3_0+.sql > /dev/null 2>&1 || true
 
 # Upgrade from last version (don't ignore failures)
-sudo sed -i "s@phpmyadmin@$db_user@g" $final_path/sql/upgrade_tables_4_7_0+.sql
-sudo mysql -u $db_user -p$db_pwd < $final_path/sql/upgrade_tables_4_7_0+.sql
-sudo sed -i "s@phpmyadmin@$db_user@g" $final_path/sql/create_tables.sql
-sudo mysql -u $db_user -p$db_pwd < $final_path/sql/create_tables.sql
+ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/upgrade_tables_4_7_0+.sql
+ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
+    < $final_path/sql/upgrade_tables_4_7_0+.sql
 
-# Configuration
-echo "Configuring application..."
-sed -i "s@YNH_DOMAIN@$domain@g" ../conf/config.inc.php
-sed -i "s@YNH_PMA_USER@$db_user@g" ../conf/config.inc.php
-sed -i "s@YNH_PMA_PASSWORD@$db_pwd@g" ../conf/config.inc.php
-sed -i "s@YNH_MYSQL_ROOT_PASSWORD@$(sudo cat /etc/yunohost/mysql)@g" ../conf/config.inc.php
-sudo cp ../conf/config.inc.php $final_path
+ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/create_tables.sql
+ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
+    < $final_path/sql/create_tables.sql
 
-# Files owned by root, www-data can just read
-echo "Setting permission..."
-sudo chown -R root: $final_path
-sudo find $final_path -type f -exec chmod 644 {} \;
-sudo find $final_path -type d -exec chmod 755 {} \;
+#=================================================
+# CONFIGURE PHPMYADMIN
+#=================================================
+
+# Verify the checksum and backup the file if it's different
+ynh_backup_if_checksum_is_different "$final_path/config.inc.php"
+
+ynh_replace_string "YNH_DOMAIN" "$domain" ../conf/config.inc.php
+ynh_replace_string "YNH_PMA_USER" "$db_name" ../conf/config.inc.php
+ynh_replace_string "YNH_PMA_PASSWORD" "$db_pwd" ../conf/config.inc.php
+ynh_replace_string "YNH_MYSQL_ROOT_PASSWORD" "$(cat $MYSQL_ROOT_PWD_FILE)" ../conf/config.inc.php
+cp ../conf/config.inc.php $final_path
+
+# Recalculate and store the config file checksum into the app settings
+ynh_store_file_checksum "$final_path/config.inc.php"
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+# SECURE FILES AND DIRECTORIES
+#=================================================
+
+# Set permissions to app files
+chown -R root: $final_path
 # config.inc.php contains sensitive data, restrict its access
-sudo chown root:www-data $final_path/config.inc.php
-sudo chmod 640 $final_path/config.inc.php
+chown root:$app $final_path/config.inc.php
+chmod 640 $final_path/config.inc.php
 
-# Modify Nginx configuration file and copy it to Nginx conf directory
-echo "Setting up nginx configuration..."
-sed -i "s@YNH_WWW_PATH@$path@g" ../conf/nginx.conf
-sed -i "s@YNH_WWW_ALIAS@$final_path@g" ../conf/nginx.conf
-sed -i "s@NAMETOCHANGE@$app@g" ../conf/nginx.conf
-nginxconf=/etc/nginx/conf.d/$domain.d/$app.conf
-sudo cp ../conf/nginx.conf $nginxconf
-sudo chown root: $nginxconf
-sudo chmod 644 $nginxconf
+#=================================================
+# SETUP SSOWAT
+#=================================================
 
-# Add dedicated php-fpm to be able to upload bigger database
-sed -i "s@NAMETOCHANGE@$app@g" ../conf/php-fpm.conf
-phpfpmconf=/etc/php5/fpm/pool.d/$app.conf
-sudo cp ../conf/php-fpm.conf $phpfpmconf
-sudo chown root: $phpfpmconf
-sudo chmod 644 $phpfpmconf
+# Restrict access to admin only
+yunohost app addaccess --users=$admin $app
 
-# We grant access to admin only
-sudo yunohost app addaccess --users=$admin $app
+#=================================================
+# RELOAD NGINX
+#=================================================
 
-sudo service php5-fpm reload
-sudo service nginx reload
-sudo yunohost app ssowatconf
+systemctl reload nginx
