@@ -6,15 +6,16 @@
         "en": "Manage MySQL databases over the web",
         "fr": "Application web de gestion des bases de données MySQL"
     },
+    "version": "4.7.4",
     "url": "http://www.phpmyadmin.net",
+    "license": "GPL-2",
     "maintainer": {
         "name": "julien",
         "email": "julien.malik@paraiso.me"
     },
     "requirements": {
-         "yunohost": ">= 2.4"
+        "yunohost": ">= 2.7.2"
     },
-    "license": "free",
     "multi_instance": false,
     "services": [
         "nginx",

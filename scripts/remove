@@ -1,30 +1,59 @@
 #!/bin/bash
-set -u
 
-source .fonctions       # Charge les fonctions génériques habituellement utilisées dans le script
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-# Récupère les infos de l'application.
-app=$YNH_APP_INSTANCE_NAME
-
-# Source app helpers
+# source _common.sh
 source /usr/share/yunohost/helpers
 
+#=================================================
+# LOAD SETTINGS
+#=================================================
+
+app=$YNH_APP_INSTANCE_NAME
+
 domain=$(ynh_app_setting_get $app domain)
-db_user=$(ynh_app_setting_get $app db_user)
+db_name=$(ynh_app_setting_get $app db_name)
+final_path=$(ynh_app_setting_get $app final_path)
 
-REMOVE_BDD $db_user # Suppression de la base de donnée et de l'utilisateur associé.
+#=================================================
+# STANDARD REMOVE
+#=================================================
+# REMOVE THE MYSQL DATABASE
+#=================================================
 
-SECURE_REMOVE '/var/www/$app'   # Suppression du dossier de l'application
+# Remove a database if it exists, along with the associated user
+ynh_mysql_remove_db $db_name $db_name
 
-REMOVE_NGINX_CONF       # Suppression de la configuration nginx
+#=================================================
+# REMOVE APP MAIN DIR
+#=================================================
 
-REMOVE_FPM_CONF # Suppression de la configuration du pool php-fpm
+# Remove the app directory securely
+ynh_secure_remove "$final_path"
 
-# Reload services after cleaning
-sudo service php5-fpm reload
-sudo service nginx reload
+#=================================================
+# REMOVE NGINX CONFIGURATION
+#=================================================
 
-# Régénère la configuration de SSOwat
-sudo yunohost app ssowatconf
+# Remove the dedicated nginx config
+ynh_remove_nginx_config
 
-echo -e "\e[0m" # Restore normal color
+#=================================================
+# REMOVE PHP-FPM CONFIGURATION
+#=================================================
+
+# Remove the dedicated php-fpm config
+ynh_remove_fpm_config
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+# REMOVE DEDICATED USER
+#=================================================
+
+# Delete a system user
+ynh_system_user_delete $app

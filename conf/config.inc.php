@@ -5,28 +5,24 @@
  * manual configuration. For easier setup you can use setup/
  *
  * All directives are explained in documentation in the doc/ folder
- * or at <http://docs.phpmyadmin.net/>.
+ * or at <https://docs.phpmyadmin.net/>.
  *
  * @package PhpMyAdmin
  */
 
-/*
+/**
  * This is needed for cookie based authentication to encrypt password in
- * cookie
+ * cookie. Needs to be 32 chars long.
  */
-/* [YunoHost]
- * We use the 'config' auth mode, so we don't care about settings
- * specific to the 'cookie' auth mode
- */
-$cfg['blowfish_secret'] = 'NOT_USED';
+$cfg['blowfish_secret'] = ''; /* YOU MUST FILL IN THIS FOR COOKIE AUTH! */
 
 
-/*
+/**
  * Servers configuration
  */
 $i = 0;
 
-/*
+/**
  * First server
  */
 $i++;
@@ -35,18 +31,18 @@ $cfg['Servers'][$i]['auth_type'] = 'config';
 $cfg['Servers'][$i]['user'] = 'root';
 $cfg['Servers'][$i]['password'] = 'YNH_MYSQL_ROOT_PASSWORD';
 /* Server parameters */
-
 /*
 $cfg['Servers'][$i]['host'] = 'localhost';
 $cfg['Servers'][$i]['connect_type'] = 'tcp';
 $cfg['Servers'][$i]['compress'] = false;
+$cfg['Servers'][$i]['AllowNoPassword'] = false;
 */
 
 /* Select mysql if your server does not have mysqli */
 $cfg['Servers'][$i]['extension'] = 'mysqli';
 $cfg['Servers'][$i]['AllowNoPassword'] = false;
 
-/*
+/**
  * phpMyAdmin configuration storage settings.
  */
 
@@ -77,23 +73,28 @@ $cfg['Servers'][$i]['savedsearches'] = 'pma__savedsearches';
 $cfg['Servers'][$i]['favorite'] = 'pma__favorite';
 $cfg['Servers'][$i]['central_columns'] = 'pma__central_columns';
 $cfg['Servers'][$i]['tracking'] = 'pma__tracking';
-
-// 4.5.3.1 update
 $cfg['Servers'][$i]['designer_settings'] = 'pma__designer_settings';
 $cfg['Servers'][$i]['export_templates'] = 'pma__export_templates';
 
 /* Contrib / Swekey authentication */
 // $cfg['Servers'][$i]['auth_swekey_config'] = '/etc/swekey-pma.conf';
 
-/*
+/**
  * End of servers configuration
  */
 
-/*
+/**
  * Directories for saving/loading files from server
  */
 $cfg['UploadDir'] = '';
 $cfg['SaveDir'] = '';
+
+/**
+ * Whether to display icons or text or both icons and text in table row
+ * action segment. Value can be either of 'icons', 'text' or 'both'.
+ * default = 'both'
+ */
+//$cfg['RowActionType'] = 'icons';
 
 /**
  * Defines whether a user should be displayed a "show all (records)"
@@ -105,20 +106,21 @@ $cfg['SaveDir'] = '';
 /**
  * Number of rows displayed when browsing a result set. If the result
  * set contains more rows, "Previous" and "Next".
- * default = 30
+ * Possible values: 25, 50, 100, 250, 500
+ * default = 25
  */
 //$cfg['MaxRows'] = 50;
 
 /**
- * disallow editing of binary fields
+ * Disallow editing of binary fields
  * valid values are:
  *   false    allow editing
  *   'blob'   allow editing except for BLOB fields
  *   'noblob' disallow editing except for BLOB fields
  *   'all'    disallow editing
- * default = blob
+ * default = 'blob'
  */
-//$cfg['ProtectBinary'] = 'false';
+//$cfg['ProtectBinary'] = false;
 
 /**
  * Default language to use, if not browser-defined or user-defined
@@ -128,12 +130,6 @@ $cfg['SaveDir'] = '';
  */
 //$cfg['DefaultLang'] = 'en';
 //$cfg['DefaultLang'] = 'de';
-
-/**
- * default display direction (horizontal|vertical|horizontalflipped)
- */
-//$cfg['DefaultDisplay'] = 'vertical';
-
 
 /**
  * How many columns should be used for table display of a database?
@@ -153,20 +149,21 @@ $cfg['SaveDir'] = '';
 
 /**
  * When using DB-based query history, how many entries should be kept?
- *
  * default = 25
  */
 //$cfg['QueryHistoryMax'] = 100;
 
 /**
- * Should error reporting be enabled for JavaScript errors
+ * Whether or not to query the user before sending the error report to
+ * the phpMyAdmin team when a JavaScript error occurs
  *
- * default = 'ask' 
+ * Available options
+ * ('ask' | 'always' | 'never')
+ * default = 'ask'
  */
-//$cfg['SendErrorReports'] = 'ask';
+//$cfg['SendErrorReports'] = 'always';
 
-/*
+/**
  * You can find more configuration options in the documentation
- * in the doc/ folder or at <http://docs.phpmyadmin.net/>.
+ * in the doc/ folder or at <https://docs.phpmyadmin.net/>.
  */
-?>

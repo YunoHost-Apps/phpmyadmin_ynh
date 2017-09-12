@@ -1,96 +1,140 @@
 #!/bin/bash
 
-source .fonctions       # Charge les fonctions génériques habituellement utilisées dans le script
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-TRAP_ON # Active trap pour arrêter le script si une erreur est détectée.
-
-# Retrieve arguments
-app=$YNH_APP_INSTANCE_NAME
-domain=$YNH_APP_ARG_DOMAIN
-path=$YNH_APP_ARG_PATH
-admin=$YNH_APP_ARG_ADMIN
-
-
-# Source app helpers
+# source _common.sh
 source /usr/share/yunohost/helpers
 
-# Vérifie que les variables ne sont pas vides.
-CHECK_VAR "$app" "app name not set"
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
 
-CHECK_USER "$admin"     # Vérifie la validité de l'user admin
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
-CHECK_PATH      # Vérifie et corrige la syntaxe du path.
-CHECK_DOMAINPATH        # Vérifie la disponibilité du path et du domaine.
+#=================================================
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
+#=================================================
 
-# Créer le repertoire de destination et stocke son emplacement.
-CHECK_FINALPATH # Vérifie que le dossier de destination n'est pas déjà utilisé.
-sudo mkdir "$final_path"
-ynh_app_setting_set $app final_path $final_path
+domain=$YNH_APP_ARG_DOMAIN
+path_url=$YNH_APP_ARG_PATH
+admin=$YNH_APP_ARG_ADMIN
 
-# Enregistre les infos dans la config YunoHost
+app=$YNH_APP_INSTANCE_NAME
+
+#=================================================
+# CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
+#=================================================
+
+final_path=/var/www/$app
+test ! -e "$final_path" || ynh_die "This path already contains a folder"
+
+# Normalize the url path syntax
+path_url=$(ynh_normalize_url_path $path_url)
+
+# Check web path availability
+ynh_webpath_available $domain $path_url
+# Register (book) web path
+ynh_webpath_register $app $domain $path_url
+
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
+
 ynh_app_setting_set $app domain $domain
-ynh_app_setting_set $app path $path
+ynh_app_setting_set $app path $path_url
 ynh_app_setting_set $app admin $admin
 
-# Copy files to the right place
-version=$(cat ../sources/upstream_version)
-sudo wget -nv https://files.phpmyadmin.net/phpMyAdmin/$version/phpMyAdmin-$version-all-languages.tar.gz -O phpMyAdmin-$version-all-languages.tar.gz
-sudo wget -nv https://files.phpmyadmin.net/phpMyAdmin/$version/phpMyAdmin-$version-all-languages.tar.gz.sha256 -O phpMyAdmin-$version-all-languages.tar.gz.sha256
-sudo sha256sum -c phpMyAdmin-$version-all-languages.tar.gz.sha256 --status || (echo "Corrupt source" >&2 && false)
-sudo tar xzf phpMyAdmin-$version-all-languages.tar.gz -C ../sources/  > /dev/null 2>&1
-sudo cp  -a ../sources/phpMyAdmin-$version-all-languages/. "$final_path"
+#=================================================
+# STANDARD MODIFICATIONS
+#=================================================
+# CREATE A MYSQL DATABASE
+#=================================================
 
-# Create db
-db_user=$app
-db_user=${db_user//-/_} # mariadb ne supporte pas les - dans les noms de base de données. Ils sont donc remplacé par des _
-# Génère un mot de passe aléatoire.
-db_pwd=$(ynh_string_random)
-CHECK_VAR "$db_pwd" "db_pwd empty"
-ynh_mysql_create_db "$db_user" "$db_user" $db_pwd
-ynh_app_setting_set $app mysqlpwd $db_pwd
-ynh_app_setting_set $app db_user $db_user
-sed -i "s@YNH_PMA_USER@$db_user@g" ../conf/create_db.sql
-sudo mysql -u root -p$(sudo cat /etc/yunohost/mysql) < ../conf/create_db.sql
-sudo sed -i "s@phpmyadmin@$db_user@g" $final_path/sql/create_tables.sql
-sudo mysql -u $db_user -p$db_pwd < $final_path/sql/create_tables.sql
+db_name=$(ynh_sanitize_dbid $app)
+ynh_app_setting_set $app db_name $db_name
+ynh_mysql_setup_db $db_name $db_name
 
-# Configuration
-echo "Configuring application..."
-sed -i "s@YNH_DOMAIN@$domain@g" ../conf/config.inc.php
-sed -i "s@YNH_PMA_USER@$db_user@g" ../conf/config.inc.php
-sed -i "s@YNH_PMA_PASSWORD@$db_pwd@g" ../conf/config.inc.php
-sed -i "s@YNH_MYSQL_ROOT_PASSWORD@$(sudo cat /etc/yunohost/mysql)@g" ../conf/config.inc.php
-sudo cp ../conf/config.inc.php $final_path
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
 
-# Files owned by root, www-data can just read
-echo "Setting permission..."
-sudo chown -R root: $final_path
-sudo find $final_path -type f -exec chmod 644 {} \;
-sudo find $final_path -type d -exec chmod 755 {} \;
+ynh_app_setting_set $app final_path $final_path
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source "$final_path"
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+
+# Create a dedicated nginx config
+ynh_add_nginx_config
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+
+# Create a system user
+ynh_system_user_create $app
+
+#=================================================
+# PHP-FPM CONFIGURATION
+#=================================================
+
+# Create a dedicated php-fpm config
+ynh_add_fpm_config
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+# POPULATE THE DATABASE
+#=================================================
+
+ynh_replace_string "YNH_PMA_USER" "$db_name" ../conf/create_db.sql
+ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
+    < ../conf/create_db.sql
+ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/create_tables.sql
+ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
+    < $final_path/sql/create_tables.sql
+
+#=================================================
+# CONFIGURE PHPMYADMIN
+#=================================================
+
+ynh_replace_string "YNH_DOMAIN" "$domain" ../conf/config.inc.php
+ynh_replace_string "YNH_PMA_USER" "$db_name" ../conf/config.inc.php
+ynh_replace_string "YNH_PMA_PASSWORD" "$db_pwd" ../conf/config.inc.php
+ynh_replace_string "YNH_MYSQL_ROOT_PASSWORD" "$(cat $MYSQL_ROOT_PWD_FILE)" ../conf/config.inc.php
+cp ../conf/config.inc.php $final_path
+
+# Recalculate and store the config file checksum into the app settings
+ynh_store_file_checksum "$final_path/config.inc.php"
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+# SECURE FILES AND DIRECTORIES
+#=================================================
+
+# Set permissions to app files
+chown -R root: $final_path
 # config.inc.php contains sensitive data, restrict its access
-sudo chown root:www-data $final_path/config.inc.php
-sudo chmod 640 $final_path/config.inc.php
+chown root:$app $final_path/config.inc.php
+chmod 640 $final_path/config.inc.php
 
-# Modify Nginx configuration file and copy it to Nginx conf directory
-echo "Setting up nginx configuration..."
-sed -i "s@YNH_WWW_PATH@$path@g" ../conf/nginx.conf
-sed -i "s@YNH_WWW_ALIAS@$final_path@g" ../conf/nginx.conf
-sed -i "s@NAMETOCHANGE@$app@g" ../conf/nginx.conf
-nginxconf=/etc/nginx/conf.d/$domain.d/$app.conf
-sudo cp ../conf/nginx.conf $nginxconf
-sudo chown root: $nginxconf
-sudo chmod 644 $nginxconf
+#=================================================
+# SETUP SSOWAT
+#=================================================
 
-# Add dedicated php-fpm to be able to upload bigger database
-sed -i "s@NAMETOCHANGE@$app@g" ../conf/php-fpm.conf
-phpfpmconf=/etc/php5/fpm/pool.d/$app.conf
-sudo cp ../conf/php-fpm.conf $phpfpmconf
-sudo chown root: $phpfpmconf
-sudo chmod 644 $phpfpmconf
+# Restrict access to admin only
+yunohost app addaccess --users=$admin $app
 
-# We grant access to admin only
-sudo yunohost app addaccess --users=$admin $app
+#=================================================
+# RELOAD NGINX
+#=================================================
 
-sudo service php5-fpm reload
-sudo service nginx reload
-sudo yunohost app ssowatconf
+systemctl reload nginx
