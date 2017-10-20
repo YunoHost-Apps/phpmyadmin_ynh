@@ -122,7 +122,7 @@ ynh_store_file_checksum "$final_path/config.inc.php"
 init_composer "$final_path"
 
 # Install dependencies
-exec_composer update --no-dev
+exec_composer "$final_path" update --no-dev
 
 #=================================================
 # GENERIC FINALIZATION
