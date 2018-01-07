@@ -26,7 +26,7 @@ init_composer() {
         php -- --quiet --install-dir="$destdir" \
     || ynh_die "Unable to install Composer"
 
-  # Force the dependance to php 5.6
+  # Force the dependence to PHP 5.6
   exec_composer "$destdir" config -g platform.php 5.6
   exec_composer "$destdir" update --no-dev
   # update dependencies to create composer.lock
