@@ -20,6 +20,8 @@ path_url=$(ynh_app_setting_get $app path)
 admin=$(ynh_app_setting_get $app admin)
 final_path=$(ynh_app_setting_get $app final_path)
 db_name=$(ynh_app_setting_get $app db_name)
+db_admin_user=$(ynh_app_setting_get $app db_admin_user)
+db_admin_pwd=$(ynh_app_setting_get $app db_admin_pwd)
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
@@ -43,6 +45,21 @@ if [ -z $admin ]; then
 	admin=$(ynh_app_setting_get $app admin_user)
 	ynh_app_setting_set "$app" admin "$admin"
 	ynh_app_setting_delete $app admin_user
+fi
+
+# If db_admin_user doesn't exist, create it
+if [ -z $db_admin_user ]; then
+	# Setup a privileged user for phpmyadmin (to prevent using MySQL root user)
+	db_admin_user="${app}_root"
+	ynh_app_setting_set $app db_admin_user $db_admin_user
+	db_admin_pwd="$(ynh_string_random)"
+	ynh_app_setting_set $app db_admin_pwd $db_admin_pwd
+
+	if ! ynh_mysql_user_exists "$db_admin_user" ; then
+	  ynh_mysql_create_user "$db_admin_user" "$db_admin_pwd"
+	  ynh_mysql_execute_as_root "GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION;
+	  FLUSH PRIVILEGES;" mysql
+	fi
 fi
 
 #=================================================
@@ -122,6 +139,8 @@ ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
 ynh_backup_if_checksum_is_different "$final_path/config.inc.php"
 
 ynh_replace_string "YNH_DOMAIN" "$domain" ../conf/config.inc.php
+ynh_replace_string "YNH_PMA_ADMIN_USER" "$db_admin_user" ../conf/config.inc.php
+ynh_replace_string "YNH_PMA_ADMIN_PASSWORD" "$db_admin_pwd" ../conf/config.inc.php
 ynh_replace_string "YNH_PMA_USER" "$db_name" ../conf/config.inc.php
 ynh_replace_string "YNH_PMA_PASSWORD" "$db_pwd" ../conf/config.inc.php
 ynh_replace_string "YNH_MYSQL_ROOT_PASSWORD" "$(cat $MYSQL_ROOT_PWD_FILE)" ../conf/config.inc.php

@@ -28,8 +28,8 @@ $i = 0;
 $i++;
 /* Authentication type */
 $cfg['Servers'][$i]['auth_type'] = 'config';
-$cfg['Servers'][$i]['user'] = 'root';
-$cfg['Servers'][$i]['password'] = 'YNH_MYSQL_ROOT_PASSWORD';
+$cfg['Servers'][$i]['user'] = 'YNH_PMA_ADMIN_USER';
+$cfg['Servers'][$i]['password'] = 'YNH_PMA_ADMIN_PASSWORD';
 /* Server parameters */
 /*
 $cfg['Servers'][$i]['host'] = 'localhost';
