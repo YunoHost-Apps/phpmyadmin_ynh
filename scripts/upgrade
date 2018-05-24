@@ -152,7 +152,7 @@ chown -R root: $final_path
 chown root:$app $final_path/config.inc.php
 chmod 640 $final_path/config.inc.php
 # Setup phpMyAdmin temporary folder
-mkdir $final_path/tmp
+mkdir -p $final_path/tmp
 chown $app: $final_path/tmp
 
 #=================================================
