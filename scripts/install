@@ -59,6 +59,17 @@ db_name=$(ynh_sanitize_dbid $app)
 ynh_app_setting_set $app db_name $db_name
 ynh_mysql_setup_db $db_name $db_name
 
+# Setup a privileged user for phpmyadmin (to prevent using MySQL root user)
+db_admin_user="${app}_root"
+ynh_app_setting_set $app db_admin_user $db_admin_user
+db_admin_pwd="$(ynh_string_random)"
+ynh_app_setting_set $app db_admin_pwd $db_admin_pwd
+
+if ! ynh_mysql_user_exists "$db_admin_user" ; then
+  ynh_mysql_create_user "$db_admin_user" "$db_admin_pwd"
+  ynh_mysql_execute_as_root "GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION;
+  FLUSH PRIVILEGES;" mysql
+fi
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
@@ -106,6 +117,8 @@ ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
 #=================================================
 
 ynh_replace_string "YNH_DOMAIN" "$domain" ../conf/config.inc.php
+ynh_replace_string "YNH_PMA_ADMIN_USER" "$db_admin_user" ../conf/config.inc.php
+ynh_replace_string "YNH_PMA_ADMIN_PASSWORD" "$db_admin_pwd" ../conf/config.inc.php
 ynh_replace_string "YNH_PMA_USER" "$db_name" ../conf/config.inc.php
 ynh_replace_string "YNH_PMA_PASSWORD" "$db_pwd" ../conf/config.inc.php
 ynh_replace_string "YNH_MYSQL_ROOT_PASSWORD" "$(cat $MYSQL_ROOT_PWD_FILE)" ../conf/config.inc.php
@@ -135,6 +148,9 @@ chown -R root: $final_path
 # config.inc.php contains sensitive data, restrict its access
 chown root:$app $final_path/config.inc.php
 chmod 640 $final_path/config.inc.php
+# Setup phpMyAdmin temporary folder
+mkdir -p $final_path/tmp
+chown $app: $final_path/tmp
 
 #=================================================
 # SETUP SSOWAT
