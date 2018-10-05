@@ -172,7 +172,7 @@ chown root:$app $final_path/config.inc.php
 chmod 640 $final_path/config.inc.php
 # Setup phpMyAdmin temporary folder
 mkdir -p $final_path/tmp
-chown $app: $final_path/tmp
+chown -R $app: $final_path/tmp
 
 #=================================================
 # SETUP SSOWAT
