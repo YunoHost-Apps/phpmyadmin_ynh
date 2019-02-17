@@ -3,22 +3,10 @@
 #=================================================
 # GENERIC START
 #=================================================
-# MANAGE SCRIPT FAILURE
-#=================================================
-
-# Exit on command errors and treat access to unset variables as an error
-set -eu
-
-#=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
-# if [ ! -e _common.sh ]; then
-# 	# Get the _common.sh file if it's not in the current directory
-# 	cp ../settings/scripts/_common.sh ./_common.sh
-# 	chmod a+rx _common.sh
-# fi
-# source _common.sh
+# source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -80,6 +68,7 @@ if ! ynh_mysql_user_exists "$db_admin_user" ; then
   ynh_mysql_execute_as_root "GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION;
   FLUSH PRIVILEGES;" mysql
 fi
+
 #=================================================
 # RECREATE THE DEDICATED USER
 #=================================================
@@ -93,6 +82,8 @@ ynh_system_user_create $app
 
 # config.inc.php contains sensitive data, restrict its access
 chown root:$app $final_path/config.inc.php
+
+chown $app: $final_path/tmp
 
 #=================================================
 # RESTORE THE PHP-FPM CONFIGURATION

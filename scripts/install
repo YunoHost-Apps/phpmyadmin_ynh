@@ -36,8 +36,6 @@ test ! -e "$final_path" || ynh_die "This path already contains a folder"
 # Normalize the url path syntax
 path_url=$(ynh_normalize_url_path $path_url)
 
-# Check web path availability
-ynh_webpath_available $domain $path_url
 # Register (book) web path
 ynh_webpath_register $app $domain $path_url
 
@@ -65,11 +63,13 @@ ynh_app_setting_set $app db_admin_user $db_admin_user
 db_admin_pwd="$(ynh_string_random)"
 ynh_app_setting_set $app db_admin_pwd $db_admin_pwd
 
-if ! ynh_mysql_user_exists "$db_admin_user" ; then
+if ! ynh_mysql_user_exists "$db_admin_user"
+then
   ynh_mysql_create_user "$db_admin_user" "$db_admin_pwd"
   ynh_mysql_execute_as_root "GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION;
   FLUSH PRIVILEGES;" mysql
 fi
+
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
@@ -105,7 +105,7 @@ ynh_add_fpm_config
 # POPULATE THE DATABASE
 #=================================================
 
-ynh_replace_string "YNH_PMA_USER" "$db_name" ../conf/create_db.sql
+ynh_replace_string "__YNH_PMA_USER__" "$db_name" ../conf/create_db.sql
 ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
     < ../conf/create_db.sql
 ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/create_tables.sql
@@ -116,26 +116,39 @@ ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
 # CONFIGURE PHPMYADMIN
 #=================================================
 
-ynh_replace_string "YNH_DOMAIN" "$domain" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_ADMIN_USER" "$db_admin_user" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_ADMIN_PASSWORD" "$db_admin_pwd" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_USER" "$db_name" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_PASSWORD" "$db_pwd" ../conf/config.inc.php
-ynh_replace_string "YNH_MYSQL_ROOT_PASSWORD" "$(cat $MYSQL_ROOT_PWD_FILE)" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_ADMIN_USER__" "$db_admin_user" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_ADMIN_PASSWORD__" "$db_admin_pwd" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_USER__" "$db_name" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_PASSWORD__" "$db_pwd" ../conf/config.inc.php
+
 cp ../conf/config.inc.php $final_path
 
-# Recalculate and store the config file checksum into the app settings
+# Calculate and store the config file checksum into the app settings
 ynh_store_file_checksum "$final_path/config.inc.php"
 
 #=================================================
-# INSTALL DEPENDENCIES
+# INSTALL DEPENDENCIES WITH COMPOSER
 #=================================================
 
+# Set permissions for initialization
+chown -R $app: "$final_path"
+
 # Install composer
-init_composer "$final_path"
+curl -sS https://getcomposer.org/installer \
+	| COMPOSER_HOME="$final_path/.composer" \
+	php -- --quiet --install-dir="$final_path" \
+	|| ynh_die "Unable to install Composer"
+
+# Update dependencies to create composer.lock
+exec_as $app COMPOSER_HOME="$final_path/.composer" \
+	php "$final_path/composer.phar" install --no-dev \
+	-d "$final_path" --quiet --no-interaction \
+	|| ynh_die "Unable to update core dependencies with Composer"
 
 # Install dependencies
-exec_composer "$final_path" update --no-dev
+ynh_exec_warn_less exec_as $app COMPOSER_HOME="$final_path/.composer" \
+	php "$final_path/composer.phar" update --no-dev \
+	-d "$final_path" --quiet --no-interaction
 
 #=================================================
 # GENERIC FINALIZATION

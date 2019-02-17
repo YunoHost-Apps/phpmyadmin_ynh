@@ -66,11 +66,14 @@ fi
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
 
-ynh_backup_before_upgrade	# Backup the current version of the app
+# Backup the current version of the app
+ynh_backup_before_upgrade
 ynh_clean_setup () {
-	ynh_restore_upgradebackup	# restore it if the upgrade fails
+	# restore it if the upgrade fails
+	ynh_restore_upgradebackup
 }
-ynh_abort_if_errors	# Exit if an error occurs during the execution of the script
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
 #=================================================
 # CHECK THE PATH
@@ -99,7 +102,7 @@ ynh_add_nginx_config
 # CREATE DEDICATED USER
 #=================================================
 
-# Create a system user
+# Create a dedicated user (if not existing)
 ynh_system_user_create $app
 
 #=================================================
@@ -138,12 +141,11 @@ ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
 # Verify the checksum and backup the file if it's different
 ynh_backup_if_checksum_is_different "$final_path/config.inc.php"
 
-ynh_replace_string "YNH_DOMAIN" "$domain" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_ADMIN_USER" "$db_admin_user" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_ADMIN_PASSWORD" "$db_admin_pwd" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_USER" "$db_name" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_PASSWORD" "$db_pwd" ../conf/config.inc.php
-ynh_replace_string "YNH_MYSQL_ROOT_PASSWORD" "$(cat $MYSQL_ROOT_PWD_FILE)" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_ADMIN_USER__" "$db_admin_user" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_ADMIN_PASSWORD__" "$db_admin_pwd" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_USER__" "$db_name" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_PASSWORD__" "$db_pwd" ../conf/config.inc.php
+
 cp ../conf/config.inc.php $final_path
 
 # Recalculate and store the config file checksum into the app settings
@@ -153,11 +155,25 @@ ynh_store_file_checksum "$final_path/config.inc.php"
 # INSTALL DEPENDENCIES
 #=================================================
 
+# Set permissions for initialization
+chown -R $app: "$final_path"
+
 # Install composer
-init_composer "$final_path"
+curl -sS https://getcomposer.org/installer \
+	| COMPOSER_HOME="$final_path/.composer" \
+	php -- --quiet --install-dir="$final_path" \
+	|| ynh_die "Unable to install Composer"
+
+# Update dependencies to create composer.lock
+exec_as $app COMPOSER_HOME="$final_path/.composer" \
+	php "$final_path/composer.phar" install --no-dev \
+	-d "$final_path" --quiet --no-interaction \
+	|| ynh_die "Unable to update core dependencies with Composer"
 
 # Install dependencies
-exec_composer "$final_path" update --no-dev
+ynh_exec_warn_less exec_as $app COMPOSER_HOME="$final_path/.composer" \
+	php "$final_path/composer.phar" update --no-dev \
+	-d "$final_path" --quiet --no-interaction
 
 #=================================================
 # GENERIC FINALIZATION
