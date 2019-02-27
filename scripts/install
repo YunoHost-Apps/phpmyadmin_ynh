@@ -8,6 +8,9 @@
 
 source _common.sh
 source /usr/share/yunohost/helpers
+# Overload the helper ynh_handle_getopts_args to have fixes from unstable.
+# Needed for composer helpers
+source _getopts_fix.sh
 
 #=================================================
 # MANAGE SCRIPT FAILURE
@@ -140,25 +143,12 @@ ynh_store_file_checksum "$final_path/config.inc.php"
 #=================================================
 ynh_print_info "Installing dependencies with Composer..."
 
-# Set permissions for initialization
-chown -R $app: "$final_path"
-
 # Install composer
-curl -sS https://getcomposer.org/installer \
-	| COMPOSER_HOME="$final_path/.composer" \
-	php -- --quiet --install-dir="$final_path" \
-	|| ynh_die "Unable to install Composer"
-
-# Update dependencies to create composer.lock
-exec_as $app COMPOSER_HOME="$final_path/.composer" \
-	php "$final_path/composer.phar" install --no-dev \
-	-d "$final_path" --quiet --no-interaction \
-	|| ynh_die "Unable to update core dependencies with Composer"
+ynh_install_composer
 
 # Install dependencies
-ynh_exec_warn_less exec_as $app COMPOSER_HOME="$final_path/.composer" \
-	php "$final_path/composer.phar" update --no-dev \
-	-d "$final_path" --quiet --no-interaction
+# ynh_exec_warn_less ynh_composer_exec --commands="update --no-dev"
+ynh_composer_exec --commands="update --no-dev"
 
 #=================================================
 # GENERIC FINALIZATION
