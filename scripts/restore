@@ -3,22 +3,10 @@
 #=================================================
 # GENERIC START
 #=================================================
-# MANAGE SCRIPT FAILURE
-#=================================================
-
-# Exit on command errors and treat access to unset variables as an error
-set -eu
-
-#=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
-# if [ ! -e _common.sh ]; then
-# 	# Get the _common.sh file if it's not in the current directory
-# 	cp ../settings/scripts/_common.sh ./_common.sh
-# 	chmod a+rx _common.sh
-# fi
-# source _common.sh
+# source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -31,6 +19,7 @@ ynh_abort_if_errors
 #=================================================
 # LOAD SETTINGS
 #=================================================
+ynh_print_info "Loading settings..."
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -43,6 +32,7 @@ db_name=$(ynh_app_setting_get $app db_name)
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
 #=================================================
+ynh_print_info "Validating restoration parameters..."
 
 ynh_webpath_available $domain $path_url \
 	|| ynh_die "Path not available: ${domain}${path_url}"
@@ -60,12 +50,14 @@ ynh_restore_file "/etc/nginx/conf.d/$domain.d/$app.conf"
 #=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
+ynh_print_info "Restoring the app main directory..."
 
 ynh_restore_file "$final_path"
 
 #=================================================
 # RESTORE THE MYSQL DATABASE
 #=================================================
+ynh_print_info "Restoring the MySQL database..."
 
 db_pwd=$(ynh_app_setting_get $app mysqlpwd)
 ynh_mysql_setup_db $db_name $db_name $db_pwd
@@ -80,9 +72,11 @@ if ! ynh_mysql_user_exists "$db_admin_user" ; then
   ynh_mysql_execute_as_root "GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION;
   FLUSH PRIVILEGES;" mysql
 fi
+
 #=================================================
 # RECREATE THE DEDICATED USER
 #=================================================
+ynh_print_info "Recreating the dedicated system user..."
 
 # Create the dedicated user (if not existing)
 ynh_system_user_create $app
@@ -94,17 +88,26 @@ ynh_system_user_create $app
 # config.inc.php contains sensitive data, restrict its access
 chown root:$app $final_path/config.inc.php
 
+chown $app: $final_path/tmp
+
 #=================================================
 # RESTORE THE PHP-FPM CONFIGURATION
 #=================================================
 
-ynh_restore_file "/etc/php5/fpm/pool.d/$app.conf"
+ynh_restore_file "/etc/php/7.0/fpm/pool.d/$app.conf"
 
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
 # RELOAD NGINX AND PHP-FPM
 #=================================================
+ynh_print_info "Reloading nginx web server and php-fpm..."
 
-systemctl reload php5-fpm
+systemctl reload php7.0-fpm
 systemctl reload nginx
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_print_info "Restoration completed for $app"

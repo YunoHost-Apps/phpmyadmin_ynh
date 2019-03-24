@@ -8,6 +8,9 @@
 
 source _common.sh
 source /usr/share/yunohost/helpers
+# Overload the helper ynh_handle_getopts_args to have fixes from unstable.
+# Needed for composer helpers
+source _getopts_fix.sh
 
 #=================================================
 # MANAGE SCRIPT FAILURE
@@ -29,6 +32,7 @@ app=$YNH_APP_INSTANCE_NAME
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
+ynh_print_info "Validating installation parameters..."
 
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
@@ -36,14 +40,13 @@ test ! -e "$final_path" || ynh_die "This path already contains a folder"
 # Normalize the url path syntax
 path_url=$(ynh_normalize_url_path $path_url)
 
-# Check web path availability
-ynh_webpath_available $domain $path_url
 # Register (book) web path
 ynh_webpath_register $app $domain $path_url
 
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
+ynh_print_info "Storing installation settings..."
 
 ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
@@ -54,6 +57,7 @@ ynh_app_setting_set $app admin $admin
 #=================================================
 # CREATE A MYSQL DATABASE
 #=================================================
+ynh_print_info "Creating a MySQL database..."
 
 db_name=$(ynh_sanitize_dbid $app)
 ynh_app_setting_set $app db_name $db_name
@@ -65,14 +69,17 @@ ynh_app_setting_set $app db_admin_user $db_admin_user
 db_admin_pwd="$(ynh_string_random)"
 ynh_app_setting_set $app db_admin_pwd $db_admin_pwd
 
-if ! ynh_mysql_user_exists "$db_admin_user" ; then
+if ! ynh_mysql_user_exists "$db_admin_user"
+then
   ynh_mysql_create_user "$db_admin_user" "$db_admin_pwd"
   ynh_mysql_execute_as_root "GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION;
   FLUSH PRIVILEGES;" mysql
 fi
+
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
+ynh_print_info "Setting up source files..."
 
 ynh_app_setting_set $app final_path $final_path
 # Download, check integrity, uncompress and patch the source from app.src
@@ -81,6 +88,7 @@ ynh_setup_source "$final_path"
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
+ynh_print_info "Configuring nginx web server..."
 
 # Create a dedicated nginx config
 ynh_add_nginx_config
@@ -88,6 +96,7 @@ ynh_add_nginx_config
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
+ynh_print_info "Configuring system user..."
 
 # Create a system user
 ynh_system_user_create $app
@@ -95,6 +104,7 @@ ynh_system_user_create $app
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
+ynh_print_info "Configuring php-fpm..."
 
 # Create a dedicated php-fpm config
 ynh_add_fpm_config
@@ -104,8 +114,9 @@ ynh_add_fpm_config
 #=================================================
 # POPULATE THE DATABASE
 #=================================================
+ynh_print_info "Filling database..."
 
-ynh_replace_string "YNH_PMA_USER" "$db_name" ../conf/create_db.sql
+ynh_replace_string "__YNH_PMA_USER__" "$db_name" ../conf/create_db.sql
 ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
     < ../conf/create_db.sql
 ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/create_tables.sql
@@ -115,27 +126,29 @@ ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
 #=================================================
 # CONFIGURE PHPMYADMIN
 #=================================================
+ynh_print_info "Configuring phpmyadmin..."
 
-ynh_replace_string "YNH_DOMAIN" "$domain" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_ADMIN_USER" "$db_admin_user" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_ADMIN_PASSWORD" "$db_admin_pwd" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_USER" "$db_name" ../conf/config.inc.php
-ynh_replace_string "YNH_PMA_PASSWORD" "$db_pwd" ../conf/config.inc.php
-ynh_replace_string "YNH_MYSQL_ROOT_PASSWORD" "$(cat $MYSQL_ROOT_PWD_FILE)" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_ADMIN_USER__" "$db_admin_user" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_ADMIN_PASSWORD__" "$db_admin_pwd" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_USER__" "$db_name" ../conf/config.inc.php
+ynh_replace_string "__YNH_PMA_PASSWORD__" "$db_pwd" ../conf/config.inc.php
+
 cp ../conf/config.inc.php $final_path
 
-# Recalculate and store the config file checksum into the app settings
+# Calculate and store the config file checksum into the app settings
 ynh_store_file_checksum "$final_path/config.inc.php"
 
 #=================================================
-# INSTALL DEPENDENCIES
+# INSTALL DEPENDENCIES WITH COMPOSER
 #=================================================
+ynh_print_info "Installing dependencies with Composer..."
 
 # Install composer
-init_composer "$final_path"
+ynh_install_composer
 
 # Install dependencies
-exec_composer "$final_path" update --no-dev
+# ynh_exec_warn_less ynh_composer_exec --commands="update --no-dev"
+ynh_composer_exec --commands="update --no-dev"
 
 #=================================================
 # GENERIC FINALIZATION
@@ -155,6 +168,7 @@ chown $app: $final_path/tmp
 #=================================================
 # SETUP SSOWAT
 #=================================================
+ynh_print_info "Configuring SSOwat..."
 
 # Restrict access to admin only
 yunohost app addaccess --users=$admin $app
@@ -162,5 +176,12 @@ yunohost app addaccess --users=$admin $app
 #=================================================
 # RELOAD NGINX
 #=================================================
+ynh_print_info "Reloading nginx web server..."
 
 systemctl reload nginx
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_print_info "Installation of $app completed"
