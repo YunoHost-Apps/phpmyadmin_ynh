@@ -72,4 +72,4 @@ ynh_system_user_delete $app
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Removal of $app completed"
+ynh_script_progression --message="Removal of $app completed" --last
