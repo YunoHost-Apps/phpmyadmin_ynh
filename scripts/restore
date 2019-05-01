@@ -19,7 +19,7 @@ ynh_abort_if_errors
 #=================================================
 # LOAD SETTINGS
 #=================================================
-ynh_print_info "Loading settings..."
+ynh_script_progression --message="Loading settings..." --weight=3
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -32,7 +32,7 @@ db_name=$(ynh_app_setting_get $app db_name)
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
 #=================================================
-ynh_print_info "Validating restoration parameters..."
+ynh_script_progression --message="Validating restoration parameters..." --weight=2
 
 ynh_webpath_available $domain $path_url \
 	|| ynh_die "Path not available: ${domain}${path_url}"
@@ -50,14 +50,14 @@ ynh_restore_file "/etc/nginx/conf.d/$domain.d/$app.conf"
 #=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
-ynh_print_info "Restoring the app main directory..."
+ynh_script_progression --message="Restoring the app main directory..."
 
 ynh_restore_file "$final_path"
 
 #=================================================
 # RESTORE THE MYSQL DATABASE
 #=================================================
-ynh_print_info "Restoring the MySQL database..."
+ynh_script_progression --message="Restoring the MySQL database..." --weight=4
 
 db_pwd=$(ynh_app_setting_get $app mysqlpwd)
 ynh_mysql_setup_db $db_name $db_name $db_pwd
@@ -76,7 +76,7 @@ fi
 #=================================================
 # RECREATE THE DEDICATED USER
 #=================================================
-ynh_print_info "Recreating the dedicated system user..."
+ynh_script_progression --message="Recreating the dedicated system user..." --weight=2
 
 # Create the dedicated user (if not existing)
 ynh_system_user_create $app
@@ -101,13 +101,13 @@ ynh_restore_file "/etc/php/7.0/fpm/pool.d/$app.conf"
 #=================================================
 # RELOAD NGINX AND PHP-FPM
 #=================================================
-ynh_print_info "Reloading nginx web server and php-fpm..."
+ynh_script_progression --message="Reloading nginx web server and php-fpm..."
 
-systemctl reload php7.0-fpm
-systemctl reload nginx
+ynh_systemd_action --service_name=php7.0-fpm --action=reload
+ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_print_info "Restoration completed for $app"
+ynh_script_progression --message="Restoration completed for $app" --last
