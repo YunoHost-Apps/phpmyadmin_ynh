@@ -135,11 +135,12 @@ ynh_add_fpm_config
 # UPGRADE THE DATABASE
 #=================================================
 
+db_pwd=$(ynh_app_setting_get $app mysqlpwd)
+
 if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
 	ynh_script_progression --message="Upgrading database..." --weight=2
 
-	db_pwd=$(ynh_app_setting_get $app mysqlpwd)
 	# Handle upgrade from a version before latest version
 	# Ignore warnings and failures that will occur if already on latest version
 	ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/upgrade_column_info_4_3_0+.sql
