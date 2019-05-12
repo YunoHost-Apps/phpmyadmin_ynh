@@ -8,14 +8,11 @@
 
 source _common.sh
 source /usr/share/yunohost/helpers
-# Overload the helper ynh_handle_getopts_args to have fixes from unstable.
-# Needed for composer helpers
-source _getopts_fix.sh
 
 #=================================================
 # LOAD SETTINGS
 #=================================================
-ynh_print_info "Loading installation settings..."
+ynh_script_progression --message="Loading installation settings..." --weight=2
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -28,9 +25,15 @@ db_admin_user=$(ynh_app_setting_get $app db_admin_user)
 db_admin_pwd=$(ynh_app_setting_get $app db_admin_pwd)
 
 #=================================================
+# CHECK VERSION
+#=================================================
+
+upgrade_type=$(ynh_check_app_version_changed)
+
+#=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_print_info "Ensuring downward compatibility..."
+ynh_script_progression --message="Ensuring downward compatibility..."
 
 # If db_name doesn't exist, create it
 if [ -z $db_name ]; then
@@ -70,7 +73,7 @@ fi
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
-ynh_print_info "Backing up the app before upgrading (may take a while)..."
+ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --weight=15
 
 # Backup the current version of the app
 ynh_backup_before_upgrade
@@ -93,15 +96,19 @@ path_url=$(ynh_normalize_url_path $path_url)
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_print_info "Upgrading source files..."
 
-# Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source "$final_path"
+if [ "$upgrade_type" == "UPGRADE_APP" ]
+then
+	ynh_script_progression --message="Upgrading source files..." --weight=5
+
+	# Download, check integrity, uncompress and patch the source from app.src
+	ynh_setup_source "$final_path"
+fi
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-ynh_print_info "Upgrading nginx web server configuration..."
+ynh_script_progression --message="Upgrading nginx web server configuration..." --weight=3
 
 # Create a dedicated nginx config
 ynh_add_nginx_config
@@ -109,7 +116,7 @@ ynh_add_nginx_config
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
-ynh_print_info "Making sure dedicated system user exists..."
+ynh_script_progression --message="Making sure dedicated system user exists..."
 
 # Create a dedicated user (if not existing)
 ynh_system_user_create $app
@@ -117,7 +124,7 @@ ynh_system_user_create $app
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
-ynh_print_info "Upgrading php-fpm configuration..."
+ynh_script_progression --message="Upgrading php-fpm configuration..." --weight=4
 
 # Create a dedicated php-fpm config
 ynh_add_fpm_config
@@ -127,28 +134,33 @@ ynh_add_fpm_config
 #=================================================
 # UPGRADE THE DATABASE
 #=================================================
-ynh_print_info "Upgrading database..."
 
 db_pwd=$(ynh_app_setting_get $app mysqlpwd)
-# Handle upgrade from a version before latest version
-# Ignore warnings and failures that will occur if already on latest version
-ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/upgrade_column_info_4_3_0+.sql
-ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
-    < $final_path/sql/upgrade_column_info_4_3_0+.sql > /dev/null 2>&1 || true
 
-# Upgrade from last version (don't ignore failures)
-ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/upgrade_tables_4_7_0+.sql
-ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
-    < $final_path/sql/upgrade_tables_4_7_0+.sql
+if [ "$upgrade_type" == "UPGRADE_APP" ]
+then
+	ynh_script_progression --message="Upgrading database..." --weight=2
 
-ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/create_tables.sql
-ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
-    < $final_path/sql/create_tables.sql
+	# Handle upgrade from a version before latest version
+	# Ignore warnings and failures that will occur if already on latest version
+	ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/upgrade_column_info_4_3_0+.sql
+	ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
+		< $final_path/sql/upgrade_column_info_4_3_0+.sql > /dev/null 2>&1 || true
+
+	# Upgrade from last version (don't ignore failures)
+	ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/upgrade_tables_4_7_0+.sql
+	ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
+		< $final_path/sql/upgrade_tables_4_7_0+.sql
+
+	ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/create_tables.sql
+	ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
+		< $final_path/sql/create_tables.sql
+fi
 
 #=================================================
 # CONFIGURE PHPMYADMIN
 #=================================================
-ynh_print_info "Reconfiguring phpmyadmin..."
+ynh_script_progression --message="Reconfiguring phpmyadmin..."
 
 # Verify the checksum and backup the file if it's different
 ynh_backup_if_checksum_is_different "$final_path/config.inc.php"
@@ -166,13 +178,18 @@ ynh_store_file_checksum "$final_path/config.inc.php"
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
-ynh_print_info "Upgrading dependencies with Composer..."
 
-# Install composer
-ynh_install_composer
+if [ "$upgrade_type" == "UPGRADE_APP" ]
+then
+	
+	ynh_script_progression --message="Upgrading dependencies with Composer..." --weight=19
 
-# Install dependencies
-ynh_exec_warn_less ynh_composer_exec --commands=\"update --no-dev\"
+	# Install composer
+	ynh_install_composer
+
+	# Install dependencies
+	ynh_exec_warn_less ynh_composer_exec --commands=\"update --no-dev\"
+fi
 
 #=================================================
 # GENERIC FINALIZATION
@@ -192,7 +209,7 @@ chown -R $app: $final_path/tmp
 #=================================================
 # SETUP SSOWAT
 #=================================================
-ynh_print_info "Upgrading SSOwat configuration..."
+ynh_script_progression --message="Upgrading SSOwat configuration..."
 
 # Restrict access to admin only
 yunohost app addaccess --users=$admin $app
@@ -200,12 +217,12 @@ yunohost app addaccess --users=$admin $app
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_print_info "Reloading nginx web server..."
+ynh_script_progression --message="Reloading nginx web server..." --weight=2
 
-systemctl reload nginx
+ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_print_info "Upgrade of $app completed"
+ynh_script_progression --message="Upgrade of $app completed" --last

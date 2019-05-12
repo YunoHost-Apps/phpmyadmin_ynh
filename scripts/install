@@ -8,9 +8,6 @@
 
 source _common.sh
 source /usr/share/yunohost/helpers
-# Overload the helper ynh_handle_getopts_args to have fixes from unstable.
-# Needed for composer helpers
-source _getopts_fix.sh
 
 #=================================================
 # MANAGE SCRIPT FAILURE
@@ -32,7 +29,7 @@ app=$YNH_APP_INSTANCE_NAME
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
-ynh_print_info "Validating installation parameters..."
+ynh_script_progression --message="Validating installation parameters..."
 
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
@@ -46,7 +43,7 @@ ynh_webpath_register $app $domain $path_url
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
-ynh_print_info "Storing installation settings..."
+ynh_script_progression --message="Storing installation settings..." --weight=2
 
 ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
@@ -57,7 +54,7 @@ ynh_app_setting_set $app admin $admin
 #=================================================
 # CREATE A MYSQL DATABASE
 #=================================================
-ynh_print_info "Creating a MySQL database..."
+ynh_script_progression --message="Creating a MySQL database..."
 
 db_name=$(ynh_sanitize_dbid $app)
 ynh_app_setting_set $app db_name $db_name
@@ -79,7 +76,7 @@ fi
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_print_info "Setting up source files..."
+ynh_script_progression --message="Setting up source files..." --weight=6
 
 ynh_app_setting_set $app final_path $final_path
 # Download, check integrity, uncompress and patch the source from app.src
@@ -88,7 +85,7 @@ ynh_setup_source "$final_path"
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-ynh_print_info "Configuring nginx web server..."
+ynh_script_progression --message="Configuring nginx web server..." --weight=3
 
 # Create a dedicated nginx config
 ynh_add_nginx_config
@@ -96,7 +93,7 @@ ynh_add_nginx_config
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
-ynh_print_info "Configuring system user..."
+ynh_script_progression --message="Configuring system user..." --weight=3
 
 # Create a system user
 ynh_system_user_create $app
@@ -104,7 +101,7 @@ ynh_system_user_create $app
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
-ynh_print_info "Configuring php-fpm..."
+ynh_script_progression --message="Configuring php-fpm..." --weight=2
 
 # Create a dedicated php-fpm config
 ynh_add_fpm_config
@@ -114,7 +111,7 @@ ynh_add_fpm_config
 #=================================================
 # POPULATE THE DATABASE
 #=================================================
-ynh_print_info "Filling database..."
+ynh_script_progression --message="Filling database..." --weight=3
 
 ynh_replace_string "__YNH_PMA_USER__" "$db_name" ../conf/create_db.sql
 ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
@@ -126,7 +123,7 @@ ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
 #=================================================
 # CONFIGURE PHPMYADMIN
 #=================================================
-ynh_print_info "Configuring phpmyadmin..."
+ynh_script_progression --message="Configuring phpmyadmin..."
 
 ynh_replace_string "__YNH_PMA_ADMIN_USER__" "$db_admin_user" ../conf/config.inc.php
 ynh_replace_string "__YNH_PMA_ADMIN_PASSWORD__" "$db_admin_pwd" ../conf/config.inc.php
@@ -141,7 +138,7 @@ ynh_store_file_checksum "$final_path/config.inc.php"
 #=================================================
 # INSTALL DEPENDENCIES WITH COMPOSER
 #=================================================
-ynh_print_info "Installing dependencies with Composer..."
+ynh_script_progression --message="Installing dependencies with Composer..." --weight=60
 
 # Install composer
 ynh_install_composer
@@ -168,7 +165,7 @@ chown $app: $final_path/tmp
 #=================================================
 # SETUP SSOWAT
 #=================================================
-ynh_print_info "Configuring SSOwat..."
+ynh_script_progression --message="Configuring SSOwat..." --weight=3
 
 # Restrict access to admin only
 yunohost app addaccess --users=$admin $app
@@ -176,12 +173,12 @@ yunohost app addaccess --users=$admin $app
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_print_info "Reloading nginx web server..."
+ynh_script_progression --message="Reloading nginx web server..." --weight=2
 
-systemctl reload nginx
+ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_print_info "Installation of $app completed"
+ynh_script_progression --message="Installation of $app completed" --last
