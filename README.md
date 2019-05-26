@@ -34,9 +34,9 @@ phpMyAdmin is a free software tool written in PHP, intended to handle the admini
 
 #### Supported architectures
 
-* x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/phpmyadmin%20%28Official%29.svg)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
-* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/phpmyadmin%20%28Official%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/phpmyadmin/)
-* Jessie x86-64b - [![Build Status](https://ci-stretch.nohost.me/ci/logs/phpmyadmin%20%28Official%29.svg)](https://ci-stretch.nohost.me/ci/apps/phpmyadmin/)
+* x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/phpmyadmin%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
+* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/phpmyadmin%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/phpmyadmin/)
+* Jessie x86-64b - [![Build Status](https://ci-stretch.nohost.me/ci/logs/phpmyadmin%20%28Apps%29.svg)](https://ci-stretch.nohost.me/ci/apps/phpmyadmin/)
 
 ## Limitations
 
@@ -46,6 +46,7 @@ phpMyAdmin is a free software tool written in PHP, intended to handle the admini
 
  * Report a bug: https://github.com/YunoHost-Apps/phpmyadmin_ynh/issues
  * Phpmyadmin website: https://www.phpmyadmin.net/
+ * Phpmyadmin repository: https://github.com/phpmyadmin/phpmyadmin
  * YunoHost website: https://yunohost.org/
 
 ---
