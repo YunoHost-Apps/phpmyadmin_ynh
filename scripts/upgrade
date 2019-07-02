@@ -16,13 +16,13 @@ ynh_script_progression --message="Loading installation settings..." --weight=2
 
 app=$YNH_APP_INSTANCE_NAME
 
-domain=$(ynh_app_setting_get $app domain)
-path_url=$(ynh_app_setting_get $app path)
-admin=$(ynh_app_setting_get $app admin)
-final_path=$(ynh_app_setting_get $app final_path)
-db_name=$(ynh_app_setting_get $app db_name)
-db_admin_user=$(ynh_app_setting_get $app db_admin_user)
-db_admin_pwd=$(ynh_app_setting_get $app db_admin_pwd)
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+path_url=$(ynh_app_setting_get --app=$app --key=path)
+admin=$(ynh_app_setting_get --app=$app --key=admin)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+db_admin_user=$(ynh_app_setting_get --app=$app --key=db_admin_user)
+db_admin_pwd=$(ynh_app_setting_get --app=$app --key=db_admin_pwd)
 
 #=================================================
 # CHECK VERSION
@@ -36,37 +36,38 @@ upgrade_type=$(ynh_check_app_version_changed)
 ynh_script_progression --message="Ensuring downward compatibility..."
 
 # If db_name doesn't exist, create it
-if [ -z $db_name ]; then
+if [ -z "$db_name" ]; then
 	# In older version, db_name was always phpmyadmin
 	db_name=phpmyadmin
-	ynh_app_setting_set $app db_name $db_name
+	ynh_app_setting_set --app=$app --key=db_name --value=$db_name
 fi
 
 # If final_path doesn't exist, create it
-if [ -z $final_path ]; then
+if [ -z "$final_path" ]; then
 	final_path="/var/www/$app"
-	ynh_app_setting_set $app final_path $final_path
+	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 fi
 
 # In older version, the admin setting was admin_user
-if [ -z $admin ]; then
-	admin=$(ynh_app_setting_get $app admin_user)
-	ynh_app_setting_set "$app" admin "$admin"
-	ynh_app_setting_delete $app admin_user
+if [ -z "$admin" ]; then
+	admin=$(ynh_app_setting_get --app=$app --key=admin_user)
+	ynh_app_setting_set --app=$app --key=admin --value=$admin
+	ynh_app_setting_delete --app=$app --key=admin_user
 fi
 
 # If db_admin_user doesn't exist, create it
-if [ -z $db_admin_user ]; then
+if [ -z "$db_admin_user" ]; then
 	# Setup a privileged user for phpmyadmin (to prevent using MySQL root user)
 	db_admin_user="${app}_root"
-	ynh_app_setting_set $app db_admin_user $db_admin_user
+	ynh_app_setting_set --app=$app --key=db_admin_user --value=$db_admin_user
 	db_admin_pwd="$(ynh_string_random)"
-	ynh_app_setting_set $app db_admin_pwd $db_admin_pwd
+	ynh_app_setting_set --app=$app --key=db_admin_pwd --value=$db_admin_pwd
 
-	if ! ynh_mysql_user_exists "$db_admin_user" ; then
-	  ynh_mysql_create_user "$db_admin_user" "$db_admin_pwd"
-	  ynh_mysql_execute_as_root "GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION;
-	  FLUSH PRIVILEGES;" mysql
+	if ! ynh_mysql_user_exists --user=$db_admin_user
+	then
+	  ynh_mysql_create_user $db_admin_user "$db_admin_pwd"
+	  ynh_mysql_execute_as_root --sql="GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION;
+	  FLUSH PRIVILEGES;" --database=mysql
 	fi
 fi
 
@@ -89,7 +90,7 @@ ynh_abort_if_errors
 #=================================================
 
 # Normalize the URL path syntax
-path_url=$(ynh_normalize_url_path $path_url)
+path_url=$(ynh_normalize_url_path --path_url=$path_url)
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -102,7 +103,7 @@ then
 	ynh_script_progression --message="Upgrading source files..." --weight=5
 
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source "$final_path"
+	ynh_setup_source --dest_dir="$final_path"
 fi
 
 #=================================================
@@ -119,7 +120,7 @@ ynh_add_nginx_config
 ynh_script_progression --message="Making sure dedicated system user exists..."
 
 # Create a dedicated user (if not existing)
-ynh_system_user_create $app
+ynh_system_user_create --username=$app
 
 #=================================================
 # PHP-FPM CONFIGURATION
@@ -135,7 +136,7 @@ ynh_add_fpm_config
 # UPGRADE THE DATABASE
 #=================================================
 
-db_pwd=$(ynh_app_setting_get $app mysqlpwd)
+db_pwd=$(ynh_app_setting_get --app=$app --key=mysqlpwd)
 
 if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
@@ -143,17 +144,17 @@ then
 
 	# Handle upgrade from a version before latest version
 	# Ignore warnings and failures that will occur if already on latest version
-	ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/upgrade_column_info_4_3_0+.sql
-	ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
+	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$final_path/sql/upgrade_column_info_4_3_0+.sql
+	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
 		< $final_path/sql/upgrade_column_info_4_3_0+.sql > /dev/null 2>&1 || true
 
 	# Upgrade from last version (don't ignore failures)
-	ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/upgrade_tables_4_7_0+.sql
-	ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
+	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$final_path/sql/upgrade_tables_4_7_0+.sql
+	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
 		< $final_path/sql/upgrade_tables_4_7_0+.sql
 
-	ynh_replace_string "phpmyadmin" "$db_name" $final_path/sql/create_tables.sql
-	ynh_mysql_connect_as "$db_name" "$db_pwd" "$db_name" \
+	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$final_path/sql/create_tables.sql
+	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
 		< $final_path/sql/create_tables.sql
 fi
 
@@ -163,17 +164,17 @@ fi
 ynh_script_progression --message="Reconfiguring phpmyadmin..."
 
 # Verify the checksum and backup the file if it's different
-ynh_backup_if_checksum_is_different "$final_path/config.inc.php"
+ynh_backup_if_checksum_is_different --file="$final_path/config.inc.php"
 
-ynh_replace_string "__YNH_PMA_ADMIN_USER__" "$db_admin_user" ../conf/config.inc.php
-ynh_replace_string "__YNH_PMA_ADMIN_PASSWORD__" "$db_admin_pwd" ../conf/config.inc.php
-ynh_replace_string "__YNH_PMA_USER__" "$db_name" ../conf/config.inc.php
-ynh_replace_string "__YNH_PMA_PASSWORD__" "$db_pwd" ../conf/config.inc.php
+ynh_replace_string --match_string="__YNH_PMA_ADMIN_USER__" --replace_string="$db_admin_user" --target_file=../conf/config.inc.php
+ynh_replace_string --match_string="__YNH_PMA_ADMIN_PASSWORD__" --replace_string="$db_admin_pwd" --target_file=../conf/config.inc.php
+ynh_replace_string --match_string="__YNH_PMA_USER__" --replace_string="$db_name" --target_file=../conf/config.inc.php
+ynh_replace_string --match_string="__YNH_PMA_PASSWORD__" --replace_string="$db_pwd" --target_file=../conf/config.inc.php
 
 cp ../conf/config.inc.php $final_path
 
 # Recalculate and store the config file checksum into the app settings
-ynh_store_file_checksum "$final_path/config.inc.php"
+ynh_store_file_checksum --file="$final_path/config.inc.php"
 
 #=================================================
 # INSTALL DEPENDENCIES
