@@ -1,5 +1,5 @@
-SOURCE_URL=https://github.com/phpmyadmin/phpmyadmin/archive/RELEASE_4_9_0_1.tar.gz
-SOURCE_SUM=974080cdd3577da098b8f1e1cc117079425973a0592cb0d737a0e95c0980ae45
+SOURCE_URL=https://github.com/phpmyadmin/phpmyadmin/archive/RELEASE_4_9_1.tar.gz
+SOURCE_SUM=dd3dfcca597dce11a830421c080758c45f9a462e8da9888fb293beecaf2fb808
 SOURCE_SUM_PRG=sha256sum
 SOURCE_FORMAT=tar.gz
 SOURCE_IN_SUBDIR=true
