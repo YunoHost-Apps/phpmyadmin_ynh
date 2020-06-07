@@ -128,7 +128,7 @@ ynh_system_user_create --username=$app
 ynh_script_progression --message="Upgrading php-fpm configuration..." --weight=4
 
 # Create a dedicated php-fpm config
-ynh_add_fpm_config
+ynh_add_fpm_config --phpversion="$YNH_PHP_VERSION" --package="$extra_php_dependencies"
 
 #=================================================
 # SPECIFIC UPGRADE
@@ -177,22 +177,6 @@ cp ../conf/config.inc.php $final_path
 ynh_store_file_checksum --file="$final_path/config.inc.php"
 
 #=================================================
-# INSTALL DEPENDENCIES
-#=================================================
-
-if [ "$upgrade_type" == "UPGRADE_APP" ]
-then
-	
-	ynh_script_progression --message="Upgrading dependencies with Composer..." --weight=19
-
-	# Install composer
-	ynh_install_composer
-
-	# Install dependencies
-	ynh_exec_warn_less ynh_composer_exec --commands=\"update --no-dev\"
-fi
-
-#=================================================
 # GENERIC FINALIZATION
 #=================================================
 # SECURE FILES AND DIRECTORIES
@@ -206,6 +190,22 @@ chmod 640 $final_path/config.inc.php
 # Setup phpMyAdmin temporary folder
 mkdir -p $final_path/tmp
 chown -R $app: $final_path/tmp
+
+
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+
+if [ "$upgrade_type" == "UPGRADE_APP" ]
+then
+	
+	ynh_script_progression --message="Upgrading dependencies with Composer..." --weight=19
+
+	# Force dependency to the used PHP version
+	ynh_exec_warn_less ynh_composer_exec --commands=\"config -g platform.php $YNH_PHP_VERSION\"
+	# Install dependencies
+	ynh_exec_warn_less ynh_composer_exec --commands=\"update --no-dev\"
+fi
 
 #=================================================
 # SETUP SSOWAT
