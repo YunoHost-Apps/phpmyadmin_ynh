@@ -95,7 +95,7 @@ chown $app: $final_path/tmp
 # RESTORE THE PHP-FPM CONFIGURATION
 #=================================================
 
-ynh_script_progression --message="Reconfiguring php-fpm..." --weight=6
+ynh_script_progression --message="Reconfiguring PHP-FPM.." --weight=6
 
 # Restore the file first, so it can have a backup if different
 ynh_restore_file --origin_path="/etc/php/$YNH_PHP_VERSION/fpm/pool.d/$app.conf"
@@ -108,7 +108,7 @@ ynh_add_fpm_config --phpversion=$YNH_PHP_VERSION --package="$extra_php_dependenc
 #=================================================
 # RELOAD NGINX AND PHP-FPM
 #=================================================
-ynh_script_progression --message="Reloading nginx web server..."
+ynh_script_progression --message="Reloading NGINX web server..."
 
 ynh_systemd_action --service_name=nginx --action=reload
 

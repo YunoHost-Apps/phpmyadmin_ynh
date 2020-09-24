@@ -28,7 +28,7 @@ phpMyAdmin est un outil logiciel libre écrit en PHP, destiné à gérer l'admin
 ## Documentation
 
  * Documentation officielle : https://www.phpmyadmin.net/docs/
- * Documentation YunoHost : If specific documentation is needed, feel free to contribute.
+ * Documentation YunoHost : https://yunohost.org/#/app_phpmyadmin_fr
 
 ## Caractéristiques spécifiques YunoHost
 
