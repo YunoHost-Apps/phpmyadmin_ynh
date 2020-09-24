@@ -3,6 +3,8 @@
 [![Integration level](https://dash.yunohost.org/integration/phpmyadmin.svg)](https://dash.yunohost.org/appci/app/phpmyadmin) ![](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.maintain.svg)  
 [![Install phpMyAdmin with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=phpmyadmin)
 
+*[Read this readme in english.](./README.md)* 
+
 > *This package allow you to install phpMyAdmin quickly and simply on a YunoHost server.  
 If you don't have YunoHost, please see [here](https://yunohost.org/#/install) to know how to install and enjoy it.*
 
@@ -50,8 +52,7 @@ phpMyAdmin is a free software tool written in PHP, intended to handle the admini
 
 ---
 
-Developers infos
-----------------
+## Developers infos
 
 Please do your pull request to the [testing branch](https://github.com/YunoHost-Apps/phpmyadmin_ynh/tree/testing).
 
