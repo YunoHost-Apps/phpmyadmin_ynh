@@ -74,7 +74,7 @@ fi
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
-ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --weight=15
+ynh_script_progression --message="Backing up phpMyAdmin before upgrading (may take a while)..." --weight=15
 
 # Backup the current version of the app
 ynh_backup_before_upgrade
@@ -191,7 +191,6 @@ chmod 640 $final_path/config.inc.php
 mkdir -p $final_path/tmp
 chown -R $app: $final_path/tmp
 
-
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
@@ -226,4 +225,4 @@ ynh_systemd_action --service_name=nginx --action=reload
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --last
+ynh_script_progression --message="Upgrade of phpMyAdmin completed" --last
