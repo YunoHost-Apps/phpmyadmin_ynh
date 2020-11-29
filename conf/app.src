@@ -1,5 +1,5 @@
-SOURCE_URL=https://files.phpmyadmin.net/phpMyAdmin/5.0.2/phpMyAdmin-5.0.2-all-languages.tar.gz
-SOURCE_SUM=8d5cb67de154262b6e51e6ac6967d0931d28ef39cdc7fbec44011d374eb432ae
+SOURCE_URL=https://files.phpmyadmin.net/phpMyAdmin/5.0.4/phpMyAdmin-5.0.4-all-languages.zip
+SOURCE_SUM=830bbca930d5e417ae4249931838e2c70ca0365044268fa0ede75e33aff677de
 SOURCE_SUM_PRG=sha256sum
 SOURCE_FORMAT=tar.gz
 SOURCE_IN_SUBDIR=true
