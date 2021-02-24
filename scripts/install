@@ -162,10 +162,10 @@ chown $app: $final_path/tmp
 #=================================================
 # SETUP SSOWAT
 #=================================================
-ynh_script_progression --message="Configuring SSOwat..." --weight=3
+ynh_script_progression --message="Configuring permissions..." --weight=3
 
 # Restrict access to admin only
-yunohost app addaccess --users=$admin $app
+ynh_permission_create --permission="admin" --allowed=$admin
 
 #=================================================
 # RELOAD NGINX

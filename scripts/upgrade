@@ -71,6 +71,11 @@ if [ -z "$db_admin_user" ]; then
 	fi
 fi
 
+if ! ynh_permission_exists --permission="admin"; then
+	# Create the required permissions
+	ynh_permission_create --permission="admin" --allowed=$admin
+fi
+
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
@@ -198,14 +203,6 @@ then
 	# Install dependencies
 	ynh_exec_warn_less ynh_composer_exec --commands=\"update --no-dev\"
 fi
-
-#=================================================
-# SETUP SSOWAT
-#=================================================
-ynh_script_progression --message="Upgrading SSOwat configuration..."
-
-# Restrict access to admin only
-yunohost app addaccess --users=$admin $app
 
 #=================================================
 # RELOAD NGINX
