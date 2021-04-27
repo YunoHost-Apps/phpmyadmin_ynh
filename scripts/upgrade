@@ -71,9 +71,11 @@ if [ -z "$db_admin_user" ]; then
 	fi
 fi
 
-if ! ynh_permission_exists --permission="admin"; then
-	# Create the required permissions
-	ynh_permission_create --permission="admin" --allowed=$admin
+# Cleaning legacy permissions
+if ynh_legacy_permissions_exists; then
+	ynh_legacy_permissions_delete_all
+
+	ynh_app_setting_delete --app=$app --key=is_public
 fi
 
 #=================================================
@@ -161,18 +163,20 @@ fi
 #=================================================
 ynh_script_progression --message="Reconfiguring phpMyAdmin..."
 
-# Verify the checksum and backup the file if it's different
-ynh_backup_if_checksum_is_different --file="$final_path/config.inc.php"
+# # Verify the checksum and backup the file if it's different
+# ynh_backup_if_checksum_is_different --file="$final_path/config.inc.php"
 
-ynh_replace_string --match_string="__YNH_PMA_ADMIN_USER__" --replace_string="$db_admin_user" --target_file=../conf/config.inc.php
-ynh_replace_string --match_string="__YNH_PMA_ADMIN_PASSWORD__" --replace_string="$db_admin_pwd" --target_file=../conf/config.inc.php
-ynh_replace_string --match_string="__YNH_PMA_USER__" --replace_string="$db_name" --target_file=../conf/config.inc.php
-ynh_replace_string --match_string="__YNH_PMA_PASSWORD__" --replace_string="$db_pwd" --target_file=../conf/config.inc.php
+# ynh_replace_string --match_string="__YNH_PMA_ADMIN_USER__" --replace_string="$db_admin_user" --target_file=../conf/config.inc.php
+# ynh_replace_string --match_string="__YNH_PMA_ADMIN_PASSWORD__" --replace_string="$db_admin_pwd" --target_file=../conf/config.inc.php
+# ynh_replace_string --match_string="__YNH_PMA_USER__" --replace_string="$db_name" --target_file=../conf/config.inc.php
+# ynh_replace_string --match_string="__YNH_PMA_PASSWORD__" --replace_string="$db_pwd" --target_file=../conf/config.inc.php
 
-cp ../conf/config.inc.php $final_path
+# cp ../conf/config.inc.php $final_path
 
-# Recalculate and store the config file checksum into the app settings
-ynh_store_file_checksum --file="$final_path/config.inc.php"
+# # Recalculate and store the config file checksum into the app settings
+# ynh_store_file_checksum --file="$final_path/config.inc.php"
+
+ynh_add_config --template="../conf/config.inc.php" --destination="$final_path/config.inc.php"
 
 #=================================================
 # GENERIC FINALIZATION

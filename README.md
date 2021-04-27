@@ -6,7 +6,7 @@
 *[Lire ce readme en français.](./README_fr.md)*
 
 > *This package allow you to install phpMyAdmin quickly and simply on a YunoHost server.  
-If you don't have YunoHost, please see [here](https://yunohost.org/#/install) to know how to install and enjoy it.*
+If you don't have YunoHost, please see [here](https://yunohost.org/install) to know how to install and enjoy it.*
 
 ## Overview
 
@@ -36,8 +36,8 @@ phpMyAdmin is a free software tool written in PHP, intended to handle the admini
 
 #### Supported architectures
 
-* x86-64 - [![Build Status](https://ci-apps.yunohost.org/ci/logs/phpmyadmin%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
-* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/phpmyadmin%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/phpmyadmin/)
+* x86-64 - [![Build Status](https://ci-apps.yunohost.org/ci/logs/phpmyadmin.svg)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
+* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/phpmyadmin.svg)](https://ci-apps-arm.yunohost.org/ci/apps/phpmyadmin/)
 
 ## Limitations
 
