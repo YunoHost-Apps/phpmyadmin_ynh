@@ -28,8 +28,8 @@ $i = 0;
 $i++;
 /* Authentication type */
 $cfg['Servers'][$i]['auth_type'] = 'config';
-$cfg['Servers'][$i]['user'] = '__YNH_PMA_ADMIN_USER__';
-$cfg['Servers'][$i]['password'] = '__YNH_PMA_ADMIN_PASSWORD__';
+$cfg['Servers'][$i]['user'] = '__DB_ADMIN_USER__';
+$cfg['Servers'][$i]['password'] = '__DB_ADMIN_PWD__';
 /* Server parameters */
 /*
 $cfg['Servers'][$i]['host'] = 'localhost';
@@ -49,11 +49,11 @@ $cfg['Servers'][$i]['AllowNoPassword'] = false;
 /* User used to manipulate with storage */
 // $cfg['Servers'][$i]['controlhost'] = '';
 // $cfg['Servers'][$i]['controlport'] = '';
-$cfg['Servers'][$i]['controluser'] = '__YNH_PMA_USER__';
-$cfg['Servers'][$i]['controlpass'] = '__YNH_PMA_PASSWORD__';
+$cfg['Servers'][$i]['controluser'] = '__DB_USER__';
+$cfg['Servers'][$i]['controlpass'] = '__DB_PWD__';
 
 /* Storage database and tables */
-$cfg['Servers'][$i]['pmadb'] = '__YNH_PMA_USER__';
+$cfg['Servers'][$i]['pmadb'] = '__DB_USER__';
 $cfg['Servers'][$i]['bookmarktable'] = 'pma__bookmark';
 $cfg['Servers'][$i]['relation'] = 'pma__relation';
 $cfg['Servers'][$i]['table_info'] = 'pma__table_info';

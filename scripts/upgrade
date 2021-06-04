@@ -91,6 +91,14 @@ ynh_clean_setup () {
 ynh_abort_if_errors
 
 #=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Making sure dedicated system user exists..."
+
+# Create a dedicated user (if not existing)
+ynh_system_user_create --username=$app --home_dir="$final_path"
+
+#=================================================
 # STANDARD UPGRADE STEPS
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -101,7 +109,7 @@ then
 	ynh_script_progression --message="Upgrading source files..." --weight=5
 
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$final_path"
+	ynh_setup_source --dest_dir="$final_path" --keep="$final_path/config.inc.php"
 fi
 
 #=================================================
@@ -111,14 +119,6 @@ ynh_script_progression --message="Upgrading NGINX web server configuration..." -
 
 # Create a dedicated NGINX config
 ynh_add_nginx_config
-
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Making sure dedicated system user exists..."
-
-# Create a dedicated user (if not existing)
-ynh_system_user_create --username=$app
 
 #=================================================
 # PHP-FPM CONFIGURATION
@@ -155,24 +155,6 @@ then
 	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
 		< $final_path/sql/create_tables.sql
 fi
-
-#=================================================
-# CONFIGURE PHPMYADMIN
-#=================================================
-ynh_script_progression --message="Reconfiguring phpMyAdmin..."
-
-# Verify the checksum and backup the file if it's different
-ynh_backup_if_checksum_is_different --file="$final_path/config.inc.php"
-
-ynh_replace_string --match_string="__YNH_PMA_ADMIN_USER__" --replace_string="$db_admin_user" --target_file=../conf/config.inc.php
-ynh_replace_string --match_string="__YNH_PMA_ADMIN_PASSWORD__" --replace_string="$db_admin_pwd" --target_file=../conf/config.inc.php
-ynh_replace_string --match_string="__YNH_PMA_USER__" --replace_string="$db_name" --target_file=../conf/config.inc.php
-ynh_replace_string --match_string="__YNH_PMA_PASSWORD__" --replace_string="$db_pwd" --target_file=../conf/config.inc.php
-
-cp ../conf/config.inc.php $final_path
-
-# Recalculate and store the config file checksum into the app settings
-ynh_store_file_checksum --file="$final_path/config.inc.php"
 
 #=================================================
 # GENERIC FINALIZATION

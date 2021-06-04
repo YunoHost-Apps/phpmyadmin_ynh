@@ -14,14 +14,14 @@
 
 -- --------------------------------------------------------
 
-DROP DATABASE `__YNH_PMA_USER__`;
+DROP DATABASE `__DB_USER__`;
 
 -- 
--- Database : `__YNH_PMA_USER__`
+-- Database : `__DB_USER__`
 -- 
-CREATE DATABASE IF NOT EXISTS `__YNH_PMA_USER__`
+CREATE DATABASE IF NOT EXISTS `__DB_USER__`
   DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
-USE __YNH_PMA_USER__;
+USE __DB_USER__;
 
-GRANT SELECT, INSERT, DELETE, UPDATE ON `__YNH_PMA_USER__`.* TO
-   '__YNH_PMA_USER__'@localhost;
+GRANT SELECT, INSERT, DELETE, UPDATE ON `__DB_USER__`.* TO
+   '__DB_USER__'@localhost;

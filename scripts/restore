@@ -48,6 +48,14 @@ test ! -d $final_path \
 ynh_restore_file --origin_path="/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
+# RECREATE THE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Recreating the dedicated system user..." --weight=2
+
+# Create the dedicated user (if not existing)
+ynh_system_user_create --username=$app --home_dir="$final_path"
+
+#=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
 ynh_script_progression --message="Restoring phpMyAdmin main directory..."
@@ -73,14 +81,6 @@ then
   ynh_mysql_execute_as_root --sql="GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION;
   FLUSH PRIVILEGES;" --database=mysql
 fi
-
-#=================================================
-# RECREATE THE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Recreating the dedicated system user..." --weight=2
-
-# Create the dedicated user (if not existing)
-ynh_system_user_create --username=$app
 
 #=================================================
 # RESTORE USER RIGHTS
