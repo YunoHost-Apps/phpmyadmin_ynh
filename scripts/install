@@ -124,8 +124,8 @@ ynh_script_progression --message="Configuring phpMyAdmin..."
 
 ynh_add_config --template="../conf/config.inc.php" --destination="$final_path/config.inc.php"
 
-chmod 400 "$final_path/some_config_file"
-chown $app:$app "$final_path/some_config_file"
+chmod 400 "$final_path/config.inc.php"
+chown $app:$app "$final_path/config.inc.php"
 
 #=================================================
 # INSTALL DEPENDENCIES WITH COMPOSER
