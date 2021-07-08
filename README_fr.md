@@ -1,64 +1,49 @@
-# phpMyAdmin avec YunoHost
+# phpMyAdmin pour YunoHost
 
 [![Niveau d'intégration](https://dash.yunohost.org/integration/phpmyadmin.svg)](https://dash.yunohost.org/appci/app/phpmyadmin) ![](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.maintain.svg)  
 [![Installer phpMyAdmin avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=phpmyadmin)
 
-*[Read this readme in english.](./README.md)* 
+*[Read this readme in english.](./README.md)*
+*[Lire ce readme en français.](./README_fr.md)*
 
-> *Ce package vous permet d'installer phpMyAdmin rapidement et simplement sur un serveur YunoHost.  
-Si vous n'avez pas YunoHost, consultez [le guide](https://yunohost.org/install) pour apprendre comment l'installer.*
+> *Ce package vous permet d'installer phpMyAdmin rapidement et simplement sur un serveur YunoHost.
+Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l'installer et en profiter.*
+
+## Vue d'ensemble
+
+Application web de gestion des bases de données MySQL
+
+**Version incluse :** 5.1.1~ynh1
+
+**Démo :** https://demo.phpmyadmin.net/master-config
+
+## Captures d'écran
+
+![](./doc/screenshots/68747470733a2f2f7777772e7068706d7961646d696e2e6e65742f7374617469632f696d616765732f73637265656e73686f74732f7374727563747572652e706e67.png)
+
+## Avertissements / informations importantes
 
 ## Vue d'ensemble
 
 phpMyAdmin est un outil logiciel libre écrit en PHP, destiné à gérer l'administration de MySQL sur le Web. phpMyAdmin prend en charge un large éventail d'opérations sur MySQL et MariaDB. Les opérations fréquemment utilisées (gestion des bases de données, des tables, des colonnes, des relations, des index, des utilisateurs, des autorisations, etc.) peuvent être effectuées via l'interface utilisateur, tandis que vous avez toujours la possibilité d'exécuter directement les instructions SQL.
+## Documentations et ressources
 
-**Version incluse :** 5.1.0
+* Site officiel de l'app : http://www.phpmyadmin.net
+* Documentation officielle utilisateur : https://yunohost.org/en/app_phpmyadmin
+* Documentation officielle de l'admin : https://www.phpmyadmin.net/docs/
+* Dépôt de code officiel de l'app : https://github.com/phpmyadmin/phpmyadmin
+* Documentation YunoHost pour cette app : https://yunohost.org/app_phpmyadmin
+* Signaler un bug : https://github.com/YunoHost-Apps/phpmyadmin_ynh/issues
 
-## Captures d'écran
+## Informations pour les développeurs
 
-![](https://www.phpmyadmin.net/static/images/screenshots/structure.png)
+Merci de faire vos pull request sur la [branche testing](https://github.com/YunoHost-Apps/phpmyadmin_ynh/tree/testing).
 
-## Démo
-
-* [Démo YunoHost](https://demo.yunohost.org/phpmyadmin/)
-* [Démo officielle](https://demo.phpmyadmin.net/master-config/)
-
-## Configuration
-
-## Documentation
-
- * Documentation officielle : https://www.phpmyadmin.net/docs/
- * Documentation YunoHost : https://yunohost.org/fr/app_phpmyadmin
-
-## Caractéristiques spécifiques YunoHost
-
-#### Support multi-utilisateur
-
-#### Architectures supportées
-
-* x86-64 - [![Build Status](https://ci-apps.yunohost.org/ci/logs/phpmyadmin.svg)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
-* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/phpmyadmin.svg)](https://ci-apps-arm.yunohost.org/ci/apps/phpmyadmin/)
-
-## Limitations
-
-## Informations additionnelles
-
-## Liens
-
- * Signaler un bug : https://github.com/YunoHost-Apps/phpmyadmin_ynh/issues
- * Site de l'application :  https://www.phpmyadmin.net/
- * Dépôt de l'application principale : https://github.com/phpmyadmin/phpmyadmin
- * Site web YunoHost : https://yunohost.org/
-
----
-
-## Developers infos
-
-Please do your pull request to the [testing branch](https://github.com/YunoHost-Apps/phpmyadmin_ynh/tree/testing).
-
-To try the testing branch, please proceed like that.
+Pour essayer la branche testing, procédez comme suit.
 ```
 sudo yunohost app install https://github.com/YunoHost-Apps/phpmyadmin_ynh/tree/testing --debug
-or
+ou
 sudo yunohost app upgrade phpmyadmin -u https://github.com/YunoHost-Apps/phpmyadmin_ynh/tree/testing --debug
 ```
+
+**Plus d'infos sur le packaging d'applications :** https://yunohost.org/packaging_apps
