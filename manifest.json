@@ -8,6 +8,14 @@
     },
     "version": "5.1.1~ynh1",
     "url": "http://www.phpmyadmin.net",
+    "upstream": {
+        "license": "GPL-2.0-only",
+        "website": "http://www.phpmyadmin.net",
+        "demo": "https://demo.phpmyadmin.net/master-config",
+        "admindoc": "https://www.phpmyadmin.net/docs/",
+        "userdoc": "https://yunohost.org/en/app_phpmyadmin",
+        "code": "https://github.com/phpmyadmin/phpmyadmin"
+    },
     "license": "GPL-2.0-only",
     "maintainer": {
         "name": "julien",

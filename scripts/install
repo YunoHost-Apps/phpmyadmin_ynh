@@ -159,7 +159,7 @@ chown $app: $final_path/tmp
 ynh_script_progression --message="Configuring permissions..." --weight=3
 
 # Restrict access to admin only
-ynh_permission_create --permission="admin" --allowed=$admin
+ynh_permission_update --permission="main" --add=$admin --remove="all_users" --protected=true
 
 #=================================================
 # RELOAD NGINX
@@ -172,4 +172,4 @@ ynh_systemd_action --service_name=nginx --action=reload
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Installation of phpMyAdmin completed" --last
+ynh_script_progression --message="Installation of $app completed" --last
