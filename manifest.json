@@ -6,8 +6,16 @@
         "en": "Manage MySQL databases over the web",
         "fr": "Application web de gestion des bases de données MySQL"
     },
-    "version": "5.1.0~ynh1",
+    "version": "5.1.1~ynh1",
     "url": "http://www.phpmyadmin.net",
+    "upstream": {
+        "license": "GPL-2.0-only",
+        "website": "http://www.phpmyadmin.net",
+        "demo": "https://demo.phpmyadmin.net/master-config",
+        "admindoc": "https://www.phpmyadmin.net/docs/",
+        "userdoc": "https://yunohost.org/en/app_phpmyadmin",
+        "code": "https://github.com/phpmyadmin/phpmyadmin"
+    },
     "license": "GPL-2.0-only",
     "maintainer": {
         "name": "julien",
@@ -27,29 +35,17 @@
             {
                 "name": "domain",
                 "type": "domain",
-                "ask": {
-                    "en": "Choose a domain for phpMyAdmin",
-                    "fr": "Choisissez un domaine pour phpMyAdmin"
-                },
                 "example": "domain.org"
             },
             {
                 "name": "path",
                 "type": "path",
-                "ask": {
-                    "en": "Choose a path for phpMyAdmin",
-                    "fr": "Choisissez un chemin pour phpMyAdmin"
-                },
                 "example": "/phpmyadmin",
                 "default": "/phpmyadmin"
             },
             {
                 "name": "admin",
                 "type": "user",
-                "ask": {
-                    "en": "Choose the only allowed admin user",
-                    "fr": "Choisissez l'unique utilisateur autorisé"
-                },
                 "example": "johndoe"
             }
         ]
