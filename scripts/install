@@ -88,6 +88,10 @@ ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$final_path"
 
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
+
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
@@ -125,7 +129,7 @@ ynh_script_progression --message="Configuring phpMyAdmin..."
 
 ynh_add_config --template="../conf/config.inc.php" --destination="$final_path/config.inc.php"
 # config.inc.php contains sensitive data, restrict its access
-chown root:$app $final_path/config.inc.php
+chown $app: $final_path/config.inc.php
 chmod 640 $final_path/config.inc.php
 
 #=================================================
@@ -146,9 +150,6 @@ ynh_composer_exec --commands="update --no-dev"
 # SECURE FILES AND DIRECTORIES
 #=================================================
 
-# Set permissions to app files
-chown -R root: $final_path
-
 # Setup phpMyAdmin temporary folder
 mkdir -p $final_path/tmp
 chown $app: $final_path/tmp
@@ -159,7 +160,7 @@ chown $app: $final_path/tmp
 ynh_script_progression --message="Configuring permissions..." --weight=3
 
 # Restrict access to admin only
-ynh_permission_update --permission="main" --remove="all_users" --add=$admin #--protected=true
+ynh_permission_update --permission="main" --remove="all_users" --add=$admin
 
 #=================================================
 # RELOAD NGINX

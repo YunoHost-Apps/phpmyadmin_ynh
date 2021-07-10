@@ -62,6 +62,10 @@ ynh_script_progression --message="Restoring phpMyAdmin main directory..."
 
 ynh_restore_file --origin_path="$final_path"
 
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
+
 #=================================================
 # RESTORE THE MYSQL DATABASE
 #=================================================
@@ -85,9 +89,6 @@ fi
 #=================================================
 # RESTORE USER RIGHTS
 #=================================================
-
-# config.inc.php contains sensitive data, restrict its access
-chown root:$app $final_path/config.inc.php
 
 chown $app: $final_path/tmp
 
