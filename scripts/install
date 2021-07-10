@@ -159,7 +159,7 @@ chown $app: $final_path/tmp
 ynh_script_progression --message="Configuring permissions..." --weight=3
 
 # Restrict access to admin only
-ynh_permission_update --permission="main" --add=$admin --remove="all_users" --protected=true
+ynh_permission_update --permission="main" --remove="all_users" --add=$admin #--protected=true
 
 #=================================================
 # RELOAD NGINX
