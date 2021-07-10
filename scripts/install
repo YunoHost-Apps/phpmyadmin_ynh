@@ -54,6 +54,7 @@ ynh_app_setting_set --app=$app --key=admin --value=$admin
 ynh_script_progression --message="Creating a MySQL database..."
 
 db_name=$(ynh_sanitize_dbid --db_name=$app)
+db_user=$db_name
 ynh_app_setting_set --app=$app --key=db_name --value=$db_name
 ynh_mysql_setup_db --db_user=$db_name --db_name=$db_name
 
@@ -71,6 +72,14 @@ then
 fi
 
 #=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Configuring system user..." --weight=3
+
+# Create a system user
+ynh_system_user_create --username=$app --home_dir="$final_path"
+
+#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression --message="Setting up source files..." --weight=6
@@ -79,6 +88,10 @@ ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$final_path"
 
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
+
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
@@ -86,14 +99,6 @@ ynh_script_progression --message="Configuring NGINX web server..." --weight=3
 
 # Create a dedicated NGINX config
 ynh_add_nginx_config
-
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Configuring system user..." --weight=3
-
-# Create a system user
-ynh_system_user_create --username=$app
 
 #=================================================
 # PHP-FPM CONFIGURATION
@@ -110,7 +115,7 @@ ynh_add_fpm_config --package="$extra_php_dependencies"
 #=================================================
 ynh_script_progression --message="Filling database..." --weight=3
 
-ynh_replace_string --match_string="__YNH_PMA_USER__" --replace_string="$db_name" --target_file=../conf/create_db.sql
+ynh_replace_string --match_string="__DB_USER__" --replace_string="$db_name" --target_file=../conf/create_db.sql
 ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
     < ../conf/create_db.sql
 ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$final_path/sql/create_tables.sql
@@ -122,15 +127,10 @@ ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name
 #=================================================
 ynh_script_progression --message="Configuring phpMyAdmin..."
 
-ynh_replace_string --match_string="__YNH_PMA_ADMIN_USER__" --replace_string="$db_admin_user" --target_file=../conf/config.inc.php
-ynh_replace_string --match_string="__YNH_PMA_ADMIN_PASSWORD__" --replace_string="$db_admin_pwd" --target_file=../conf/config.inc.php
-ynh_replace_string --match_string="__YNH_PMA_USER__" --replace_string="$db_name" --target_file=../conf/config.inc.php
-ynh_replace_string --match_string="__YNH_PMA_PASSWORD__" --replace_string="$db_pwd" --target_file=../conf/config.inc.php
-
-cp ../conf/config.inc.php $final_path
-
-# Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum --file="$final_path/config.inc.php"
+ynh_add_config --template="../conf/config.inc.php" --destination="$final_path/config.inc.php"
+# config.inc.php contains sensitive data, restrict its access
+chown $app: $final_path/config.inc.php
+chmod 640 $final_path/config.inc.php
 
 #=================================================
 # INSTALL DEPENDENCIES WITH COMPOSER
@@ -150,11 +150,6 @@ ynh_composer_exec --commands="update --no-dev"
 # SECURE FILES AND DIRECTORIES
 #=================================================
 
-# Set permissions to app files
-chown -R root: $final_path
-# config.inc.php contains sensitive data, restrict its access
-chown root:$app $final_path/config.inc.php
-chmod 640 $final_path/config.inc.php
 # Setup phpMyAdmin temporary folder
 mkdir -p $final_path/tmp
 chown $app: $final_path/tmp
@@ -165,7 +160,7 @@ chown $app: $final_path/tmp
 ynh_script_progression --message="Configuring permissions..." --weight=3
 
 # Restrict access to admin only
-ynh_permission_update --permission="main" --add=$admin --remove="all_users"
+ynh_permission_update --permission="main" --remove="all_users" --add=$admin
 
 #=================================================
 # RELOAD NGINX
