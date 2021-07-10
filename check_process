@@ -11,7 +11,7 @@
 		setup_private=0
 		setup_public=0
 		upgrade=1
-		upgrade=1	from_commit=09ad01673cdfb9f893c138d92fce3bc965f5f8ed
+		upgrade=1	from_commit=e8bcf5f9e61621256fa62f8813ba161443dd488b
 		backup_restore=1
 		multi_instance=0
 		change_url=1
@@ -19,6 +19,6 @@
 Email=
 Notification=none
 ;;; Upgrade options
-	; commit=09ad01673cdfb9f893c138d92fce3bc965f5f8ed
-		name=Force php5 for composer
+	; commit=e8bcf5f9e61621256fa62f8813ba161443dd488b
+		name=Testing (#106)
 		manifest_arg=domain=DOMAIN&path=PATH&admin=USER&
