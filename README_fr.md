@@ -13,7 +13,7 @@ Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour
 
 Application web de gestion des bases de données MySQL
 
-**Version incluse :** 5.1.1~ynh1
+**Version incluse :** 5.1.1~ynh2
 
 **Démo :** https://demo.phpmyadmin.net/master-config
 
@@ -29,7 +29,6 @@ phpMyAdmin est un outil logiciel libre écrit en PHP, destiné à gérer l'admin
 ## Documentations et ressources
 
 * Site officiel de l'app : http://www.phpmyadmin.net
-* Documentation officielle utilisateur : https://yunohost.org/en/app_phpmyadmin
 * Documentation officielle de l'admin : https://www.phpmyadmin.net/docs/
 * Dépôt de code officiel de l'app : https://github.com/phpmyadmin/phpmyadmin
 * Documentation YunoHost pour cette app : https://yunohost.org/app_phpmyadmin

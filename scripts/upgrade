@@ -181,9 +181,9 @@ then
 	ynh_script_progression --message="Upgrading dependencies with Composer..." --weight=19
 
 	# Force dependency to the used PHP version
-	ynh_exec_warn_less ynh_composer_exec --commands=\"config -g platform.php $YNH_PHP_VERSION\"
+	ynh_exec_warn_less ynh_composer_exec --commands="config -g platform.php $YNH_PHP_VERSION"
 	# Install dependencies
-	ynh_exec_warn_less ynh_composer_exec --commands=\"update --no-dev\"
+	ynh_exec_warn_less ynh_composer_exec --commands="update --no-dev"
 fi
 
 #=================================================

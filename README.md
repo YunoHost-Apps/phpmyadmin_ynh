@@ -17,7 +17,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 
 Manage MySQL databases over the web
 
-**Shipped version:** 5.1.1~ynh1
+**Shipped version:** 5.1.1~ynh2
 
 **Demo:** https://demo.phpmyadmin.net/master-config
 
@@ -33,7 +33,6 @@ phpMyAdmin is a free software tool written in PHP, intended to handle the admini
 ## Documentation and resources
 
 * Official app website: http://www.phpmyadmin.net
-* Official user documentation: https://yunohost.org/en/app_phpmyadmin
 * Official admin documentation: https://www.phpmyadmin.net/docs/
 * Upstream app code repository: https://github.com/phpmyadmin/phpmyadmin
 * YunoHost documentation for this app: https://yunohost.org/app_phpmyadmin
