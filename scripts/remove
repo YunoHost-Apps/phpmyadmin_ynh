@@ -35,6 +35,14 @@ ynh_mysql_remove_db --db_user=$db_name --db_name=$db_name
 ynh_mysql_drop_user $db_admin_user
 
 #=================================================
+# REMOVE DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Removing dependencies..." --weight=1
+
+# Remove metapackage and its dependencies
+ynh_remove_app_dependencies
+
+#=================================================
 # REMOVE APP MAIN DIR
 #=================================================
 ynh_script_progression --message="Removing phpMyAdmin main directory"
