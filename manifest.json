@@ -13,7 +13,6 @@
         "website": "http://www.phpmyadmin.net",
         "demo": "https://demo.phpmyadmin.net/master-config",
         "admindoc": "https://www.phpmyadmin.net/docs/",
-        "userdoc": "https://yunohost.org/en/app_phpmyadmin",
         "code": "https://github.com/phpmyadmin/phpmyadmin"
     },
     "license": "GPL-2.0-only",
@@ -34,8 +33,7 @@
         "install" : [
             {
                 "name": "domain",
-                "type": "domain",
-                "example": "domain.org"
+                "type": "domain"
             },
             {
                 "name": "path",
@@ -45,8 +43,7 @@
             },
             {
                 "name": "admin",
-                "type": "user",
-                "example": "johndoe"
+                "type": "user"
             }
         ]
     }
