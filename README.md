@@ -17,7 +17,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 
 Manage MySQL databases over the web
 
-**Shipped version:** 5.1.1~ynh3
+**Shipped version:** 5.1.3~ynh1
 
 **Demo:** https://demo.phpmyadmin.net/master-config
 
