@@ -13,7 +13,7 @@ Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour
 
 Application web de gestion des bases de données MySQL
 
-**Version incluse :** 5.1.3~ynh1
+**Version incluse :** 5.2.0~ynh1
 
 **Démo :** https://demo.phpmyadmin.net/master-config
 
