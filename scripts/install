@@ -134,6 +134,8 @@ ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name
 #=================================================
 ynh_script_progression --message="Configuring phpMyAdmin..." --weight=2
 
+ynh_add_config --template="../conf/composer.json" --destination="$final_path/scomposer.json"
+
 ynh_add_config --template="../conf/config.inc.php" --destination="$final_path/config.inc.php"
 # config.inc.php contains sensitive data, restrict its access
 chown $app: $final_path/config.inc.php
