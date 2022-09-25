@@ -63,7 +63,7 @@ ynh_script_progression --message="Creating a MySQL database..."
 db_name=$(ynh_sanitize_dbid --db_name=$app)
 db_user=$db_name
 ynh_app_setting_set --app=$app --key=db_name --value=$db_name
-ynh_mysql_setup_db --db_user=$db_name --db_name=$db_name
+ynh_mysql_setup_db --db_user=$db_user --db_name=$db_name
 
 # Setup a privileged user for phpmyadmin (to prevent using MySQL root user)
 db_admin_user="${app}_root"
@@ -100,20 +100,20 @@ chmod -R o-rwx "$final_path"
 chown -R $app:www-data "$final_path"
 
 #=================================================
-# NGINX CONFIGURATION
-#=================================================
-ynh_script_progression --message="Configuring NGINX web server..." --weight=3
-
-# Create a dedicated NGINX config
-ynh_add_nginx_config
-
-#=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
 ynh_script_progression --message="Configuring PHP-FPM..." --weight=2
 
 # Create a dedicated PHP-FPM config
 ynh_add_fpm_config
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+ynh_script_progression --message="Configuring NGINX web server..." --weight=3
+
+# Create a dedicated NGINX config
+ynh_add_nginx_config
 
 #=================================================
 # SPECIFIC SETUP
@@ -132,7 +132,7 @@ ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name
 #=================================================
 # CONFIGURE PHPMYADMIN
 #=================================================
-ynh_script_progression --message="Configuring phpMyAdmin..."
+ynh_script_progression --message="Configuring phpMyAdmin..." --weight=2
 
 ynh_add_config --template="../conf/config.inc.php" --destination="$final_path/config.inc.php"
 # config.inc.php contains sensitive data, restrict its access
@@ -148,7 +148,6 @@ ynh_script_progression --message="Installing dependencies with Composer..." --we
 ynh_install_composer
 
 # Install dependencies
-# ynh_exec_warn_less ynh_composer_exec --commands="update --no-dev"
 ynh_composer_exec --commands="update --no-dev"
 
 #=================================================
