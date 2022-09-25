@@ -94,6 +94,7 @@ ynh_script_progression --message="Setting up source files..." --weight=6
 ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$final_path"
+ynh_add_config --template="../conf/composer.json" --destination="$final_path/scomposer.json"
 
 chmod 750 "$final_path"
 chmod -R o-rwx "$final_path"
@@ -133,8 +134,6 @@ ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name
 # CONFIGURE PHPMYADMIN
 #=================================================
 ynh_script_progression --message="Configuring phpMyAdmin..." --weight=2
-
-ynh_add_config --template="../conf/composer.json" --destination="$final_path/scomposer.json"
 
 ynh_add_config --template="../conf/config.inc.php" --destination="$final_path/config.inc.php"
 # config.inc.php contains sensitive data, restrict its access
