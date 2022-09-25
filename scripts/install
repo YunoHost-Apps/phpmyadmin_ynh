@@ -148,7 +148,7 @@ ynh_script_progression --message="Installing dependencies with Composer..." --we
 ynh_install_composer
 
 # Install dependencies
-ynh_composer_exec --commands="update --no-dev"
+ynh_composer_exec --commands="update --with-all-dependencies --no-dev" 
 
 #=================================================
 # GENERIC FINALIZATION
