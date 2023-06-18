@@ -6,6 +6,7 @@ It shall NOT be edited by hand.
 # phpMyAdmin pour YunoHost
 
 [![Niveau d’intégration](https://dash.yunohost.org/integration/phpmyadmin.svg)](https://dash.yunohost.org/appci/app/phpmyadmin) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.maintain.svg)
+
 [![Installer phpMyAdmin avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=phpmyadmin)
 
 *[Read this readme in english.](./README.md)*
@@ -15,7 +16,7 @@ Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) po
 
 ## Vue d’ensemble
 
-Application web de gestion des bases de données MySQL
+phpMyAdmin est un outil logiciel libre écrit en PHP, destiné à gérer l'administration de MySQL sur le Web. phpMyAdmin prend en charge un large éventail d'opérations sur MySQL et MariaDB. Les opérations fréquemment utilisées (gestion des bases de données, des tables, des colonnes, des relations, des index, des utilisateurs, des autorisations, etc.) peuvent être effectuées via l'interface utilisateur, tandis que vous avez toujours la possibilité d'exécuter directement les instructions SQL.
 
 **Version incluse :** 5.2.0~ynh1
 
