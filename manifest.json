@@ -6,7 +6,7 @@
         "en": "Manage MySQL databases over the web",
         "fr": "Application web de gestion des bases de données MySQL"
     },
-    "version": "5.2.0~ynh1",
+    "version": "5.2.1~ynh1",
     "url": "http://www.phpmyadmin.net",
     "upstream": {
         "license": "GPL-2.0-only",
