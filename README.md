@@ -5,7 +5,8 @@ It shall NOT be edited by hand.
 
 # phpMyAdmin for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/phpmyadmin.svg)](https://dash.yunohost.org/appci/app/phpmyadmin) ![Working status](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.maintain.svg)  
+[![Integration level](https://dash.yunohost.org/integration/phpmyadmin.svg)](https://dash.yunohost.org/appci/app/phpmyadmin) ![Working status](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.maintain.svg)
+
 [![Install phpMyAdmin with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=phpmyadmin)
 
 *[Lire ce readme en français.](./README_fr.md)*
@@ -18,7 +19,6 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 Manage MySQL databases over the web
 
 **Shipped version:** 5.1.3~ynh1
-
 
 **Demo:** https://demo.phpmyadmin.net/master-config
 
@@ -36,7 +36,7 @@ phpMyAdmin is a free software tool written in PHP, intended to handle the admini
 * Official app website: <http://www.phpmyadmin.net>
 * Official admin documentation: <https://www.phpmyadmin.net/docs/>
 * Upstream app code repository: <https://github.com/phpmyadmin/phpmyadmin>
-* YunoHost documentation for this app: <https://yunohost.org/app_phpmyadmin>
+* YunoHost Store: <https://apps.yunohost.org/app/phpmyadmin>
 * Report a bug: <https://github.com/YunoHost-Apps/phpmyadmin_ynh/issues>
 
 ## Developer info
