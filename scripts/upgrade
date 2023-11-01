@@ -38,8 +38,7 @@ if [ -z "$db_admin_user" ]; then
 	if ! ynh_mysql_user_exists --user=$db_admin_user
 	then
 	  ynh_mysql_create_user $db_admin_user "$db_admin_pwd"
-	  ynh_mysql_execute_as_root --sql="GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION;
-	  FLUSH PRIVILEGES;" --database=mysql
+	  ynh_mysql_execute_as_root --sql="GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION; FLUSH PRIVILEGES;" --database=mysql
 	fi
 fi
 
