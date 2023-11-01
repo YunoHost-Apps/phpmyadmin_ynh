@@ -40,10 +40,6 @@ ram.runtime = "50M"
     type = "path"
     default = "/phpmyadmin"
 
-    [install.admin]
-    # this is a generic question - ask strings are automatically handled by Yunohost's core
-    type = "user"
-
 [resources]
         [resources.sources.main]
         url = "https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-all-languages.tar.gz"
