@@ -6,6 +6,7 @@ It shall NOT be edited by hand.
 # phpMyAdmin pour YunoHost
 
 [![Niveau d’intégration](https://dash.yunohost.org/integration/phpmyadmin.svg)](https://dash.yunohost.org/appci/app/phpmyadmin) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.maintain.svg)
+
 [![Installer phpMyAdmin avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=phpmyadmin)
 
 *[Read this readme in english.](./README.md)*
@@ -30,7 +31,7 @@ phpMyAdmin est un outil logiciel libre écrit en PHP, destiné à gérer l'admin
 * Site officiel de l’app : <http://www.phpmyadmin.net>
 * Documentation officielle de l’admin : <https://www.phpmyadmin.net/docs/>
 * Dépôt de code officiel de l’app : <https://github.com/phpmyadmin/phpmyadmin>
-* Documentation YunoHost pour cette app : <https://yunohost.org/app_phpmyadmin>
+* YunoHost Store: <https://apps.yunohost.org/app/phpmyadmin>
 * Signaler un bug : <https://github.com/YunoHost-Apps/phpmyadmin_ynh/issues>
 
 ## Informations pour les développeurs
