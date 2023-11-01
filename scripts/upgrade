@@ -10,22 +10,6 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# LOAD SETTINGS
-#=================================================
-ynh_script_progression --message="Loading installation settings..." --weight=2
-
-app=$YNH_APP_INSTANCE_NAME
-
-domain=$(ynh_app_setting_get --app=$app --key=domain)
-path_url=$(ynh_app_setting_get --app=$app --key=path)
-admin=$(ynh_app_setting_get --app=$app --key=admin)
-final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-db_name=$(ynh_app_setting_get --app=$app --key=db_name)
-db_user=$db_name
-db_admin_user=$(ynh_app_setting_get --app=$app --key=db_admin_user)
-db_admin_pwd=$(ynh_app_setting_get --app=$app --key=db_admin_pwd)
-
-#=================================================
 # CHECK VERSION
 #=================================================
 
@@ -35,19 +19,6 @@ upgrade_type=$(ynh_check_app_version_changed)
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..."
-
-# If db_name doesn't exist, create it
-if [ -z "$db_name" ]; then
-	# In older version, db_name was always phpmyadmin
-	db_name=phpmyadmin
-	ynh_app_setting_set --app=$app --key=db_name --value=$db_name
-fi
-
-# If final_path doesn't exist, create it
-if [ -z "$final_path" ]; then
-	final_path="/var/www/$app"
-	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
-fi
 
 # In older version, the admin setting was admin_user
 if [ -z "$admin" ]; then
@@ -72,33 +43,6 @@ if [ -z "$db_admin_user" ]; then
 	fi
 fi
 
-if ! ynh_permission_exists --permission="admin"; then
-	# Create the required permissions
-	ynh_permission_create --permission="admin" --allowed=$admin
-fi
-
-#=================================================
-# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
-#=================================================
-ynh_script_progression --message="Backing up phpMyAdmin before upgrading (may take a while)..." --weight=15
-
-# Backup the current version of the app
-ynh_backup_before_upgrade
-ynh_clean_setup () {
-	# restore it if the upgrade fails
-	ynh_restore_upgradebackup
-}
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
-
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Making sure dedicated system user exists..."
-
-# Create a dedicated user (if not existing)
-ynh_system_user_create --username=$app --home_dir="$final_path"
-
 #=================================================
 # STANDARD UPGRADE STEPS
 #=================================================
@@ -110,12 +54,12 @@ then
 	ynh_script_progression --message="Upgrading source files..." --weight=5
 
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$final_path" --keep="config.inc.php"
+	ynh_setup_source --dest_dir="$install_dir" --keep="config.inc.php" --full_replace=1
 fi
 
-chmod 750 "$final_path"
-chmod -R o-rwx "$final_path"
-chown -R $app:www-data "$final_path"
+chmod 750 "$install_dir"
+chmod -R o-rwx "$install_dir"
+chown -R $app:www-data "$install_dir"
 
 #=================================================
 # NGINX CONFIGURATION
@@ -124,13 +68,6 @@ ynh_script_progression --message="Upgrading NGINX web server configuration..." -
 
 # Create a dedicated NGINX config
 ynh_add_nginx_config
-
-#=================================================
-# UPGRADE DEPENDENCIES
-#=================================================
-ynh_script_progression --message="Upgrading dependencies..." --weight=1
-
-ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # PHP-FPM CONFIGURATION
@@ -146,26 +83,24 @@ ynh_add_fpm_config
 # UPGRADE THE DATABASE
 #=================================================
 
-db_pwd=$(ynh_app_setting_get --app=$app --key=mysqlpwd)
-
 if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
 	ynh_script_progression --message="Upgrading database..." --weight=2
 
 	# Handle upgrade from a version before latest version
 	# Ignore warnings and failures that will occur if already on latest version
-	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$final_path/sql/upgrade_column_info_4_3_0+.sql
+	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/upgrade_column_info_4_3_0+.sql
 	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
-		< $final_path/sql/upgrade_column_info_4_3_0+.sql > /dev/null 2>&1 || true
+		< $install_dir/sql/upgrade_column_info_4_3_0+.sql > /dev/null 2>&1 || true
 
 	# Upgrade from last version (don't ignore failures)
-	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$final_path/sql/upgrade_tables_4_7_0+.sql
+	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/upgrade_tables_4_7_0+.sql
 	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
-		< $final_path/sql/upgrade_tables_4_7_0+.sql
+		< $install_dir/sql/upgrade_tables_4_7_0+.sql
 
-	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$final_path/sql/create_tables.sql
+	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/create_tables.sql
 	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
-		< $final_path/sql/create_tables.sql
+		< $install_dir/sql/create_tables.sql
 fi
 
 #=================================================
@@ -175,8 +110,8 @@ fi
 #=================================================
 
 # Setup phpMyAdmin temporary folder
-mkdir -p $final_path/tmp
-chown -R $app: $final_path/tmp
+mkdir -p $install_dir/tmp
+chown -R $app: $install_dir/tmp
 
 #=================================================
 # INSTALL DEPENDENCIES
@@ -184,21 +119,16 @@ chown -R $app: $final_path/tmp
 
 if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
-	
 	ynh_script_progression --message="Upgrading dependencies with Composer..." --weight=19
+
+	# Install Composer
+	ynh_install_composer
 
 	# Force dependency to the used PHP version
 	ynh_exec_warn_less ynh_composer_exec --commands="config -g platform.php $YNH_PHP_VERSION"
 	# Install dependencies
 	ynh_exec_warn_less ynh_composer_exec --commands="update --no-dev"
 fi
-
-#=================================================
-# RELOAD NGINX
-#=================================================
-ynh_script_progression --message="Reloading NGINX web server..." --weight=2
-
-ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
 # END OF SCRIPT
