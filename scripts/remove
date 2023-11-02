@@ -10,26 +10,17 @@
 source /usr/share/yunohost/helpers
 
 #=================================================
-# STANDARD REMOVE
+# REMOVE SYSTEM CONFIGURATIONS
 #=================================================
-# REMOVE THE MYSQL SUPERUSER
+# REMOVE SYSTEMD SERVICE 
 #=================================================
+ynh_script_progression --message="Removing system configurations related to $app..." --weight=1
 
 # Remove phpmyadmin MySQL admin user
 ynh_mysql_drop_user $db_admin_user
 
-#=================================================
-# REMOVE NGINX CONFIGURATION
-#=================================================
-ynh_script_progression --message="Removing NGINX web server configuration"
-
 # Remove the dedicated NGINX config
 ynh_remove_nginx_config
-
-#=================================================
-# REMOVE PHP-FPM CONFIGURATION
-#=================================================
-ynh_script_progression --message="Removing PHP-FPM configuration" --weight=2
 
 # Remove the dedicated PHP-FPM config
 ynh_remove_fpm_config

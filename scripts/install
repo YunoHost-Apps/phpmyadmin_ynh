@@ -40,17 +40,12 @@ chmod -R o-rwx "$install_dir"
 chown -R $app:www-data "$install_dir"
 
 #=================================================
-# NGINX CONFIGURATION
+# SYSTEM CONFIGURATION
 #=================================================
-ynh_script_progression --message="Configuring NGINX web server..." --weight=3
+ynh_script_progression --message="Adding system configurations related to $app..." --weight=1
 
 # Create a dedicated NGINX config
 ynh_add_nginx_config
-
-#=================================================
-# PHP-FPM CONFIGURATION
-#=================================================
-ynh_script_progression --message="Configuring PHP-FPM..." --weight=2
 
 # Create a dedicated PHP-FPM config
 ynh_add_fpm_config
@@ -69,7 +64,7 @@ ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name
 #=================================================
 # CONFIGURE PHPMYADMIN
 #=================================================
-ynh_script_progression --message="Configuring phpMyAdmin..."
+ynh_script_progression --message="Configuring $app..."
 
 ynh_add_config --template="../conf/config.inc.php" --destination="$install_dir/config.inc.php"
 # config.inc.php contains sensitive data, restrict its access
