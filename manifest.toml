@@ -7,7 +7,7 @@ name = "phpMyAdmin"
 description.en = "Manage MySQL databases over the web"
 description.fr = "Application web de gestion des bases de données MySQL"
 
-version = "5.1.3~ynh2"
+version = "5.2.1~ynh1"
 
 maintainers = ["julien"]
 
@@ -42,8 +42,8 @@ ram.runtime = "50M"
 
 [resources]
         [resources.sources.main]
-        url = "https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-all-languages.tar.gz"
-        sha256 = "7a85454d82d88cc1a6beb09114a67fa40230c4eff2ae1778b434fa74e80dc6d7"
+        url = "https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz"
+        sha256 = "61c763f209817d1b5d96a4c0eab65b4e36bce744f78e73bef3bebd1c07481c46"
 
     [resources.system_user]
 
