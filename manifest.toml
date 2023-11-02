@@ -1,0 +1,58 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/master/schemas/manifest.v2.schema.json
+
+packaging_format = 2
+
+id = "phpmyadmin"
+name = "phpMyAdmin"
+description.en = "Manage MySQL databases over the web"
+description.fr = "Application web de gestion des bases de données MySQL"
+
+version = "5.2.1~ynh1"
+
+maintainers = ["julien"]
+
+[upstream]
+license = "GPL-2.0-only"
+website = "http://www.phpmyadmin.net"
+demo = "https://demo.phpmyadmin.net/master-config"
+admindoc = "https://www.phpmyadmin.net/docs/"
+code = "https://github.com/phpmyadmin/phpmyadmin"
+cpe = "cpe:2.3:a:phpmyadmin:phpmyadmin"
+fund = "https://www.phpmyadmin.net/donate/"
+
+[integration]
+yunohost = ">= 11.2"
+architectures = "all"
+multi_instance = false
+ldap = true
+sso = true
+disk = "100M"
+ram.build = "50M"
+ram.runtime = "50M"
+
+[install]
+    [install.domain]
+    type = "domain"
+
+    [install.path]
+    type = "path"
+    default = "/phpmyadmin"
+
+[resources]
+        [resources.sources.main]
+        url = "https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz"
+        sha256 = "61c763f209817d1b5d96a4c0eab65b4e36bce744f78e73bef3bebd1c07481c46"
+
+    [resources.system_user]
+
+    [resources.install_dir]
+
+    [resources.permissions]
+    main.url = "/"
+    main.allowed = "admins"
+
+    [resources.apt]
+    packages = "mariadb-server php8.2-xml, php8.2-curl, php8.2-zip, php8.2-mysql, php8.2-mbstring"
+
+    [resources.database]
+    type = "mysql"
