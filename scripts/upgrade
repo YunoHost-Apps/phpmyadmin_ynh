@@ -21,9 +21,11 @@ upgrade_type=$(ynh_check_app_version_changed)
 ynh_script_progression --message="Ensuring downward compatibility..."
 
 # In older version, the admin setting was admin_user
-if [ -z "$admin" ]; then
-	admin=$(ynh_app_setting_get --app=$app --key=admin_user)
-	ynh_app_setting_set --app=$app --key=admin --value=$admin
+if [ -n "$admin" ]; then
+	ynh_app_setting_delete --app=$app --key=admin
+fi
+
+if [ -n "$admin_user" ]; then
 	ynh_app_setting_delete --app=$app --key=admin_user
 fi
 
