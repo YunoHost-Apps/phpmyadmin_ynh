@@ -10,12 +10,6 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# CHECK VERSION
-#=================================================
-
-upgrade_type=$(ynh_check_app_version_changed)
-
-#=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..."
@@ -49,14 +43,10 @@ fi
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
+ynh_script_progression --message="Upgrading source files..." --weight=5
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
-then
-	ynh_script_progression --message="Upgrading source files..." --weight=5
-
-	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$install_dir" --keep="config.inc.php" --full_replace=1
-fi
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$install_dir" --keep="config.inc.php" --full_replace=1
 
 chmod 750 "$install_dir"
 chmod -R o-rwx "$install_dir"
@@ -78,26 +68,22 @@ ynh_add_fpm_config
 #=================================================
 # UPGRADE THE DATABASE
 #=================================================
+ynh_script_progression --message="Upgrading database..." --weight=2
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
-then
-	ynh_script_progression --message="Upgrading database..." --weight=2
+# Handle upgrade from a version before latest version
+# Ignore warnings and failures that will occur if already on latest version
+ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/upgrade_column_info_4_3_0+.sql
+ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
+	< $install_dir/sql/upgrade_column_info_4_3_0+.sql > /dev/null 2>&1 || true
 
-	# Handle upgrade from a version before latest version
-	# Ignore warnings and failures that will occur if already on latest version
-	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/upgrade_column_info_4_3_0+.sql
-	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
-		< $install_dir/sql/upgrade_column_info_4_3_0+.sql > /dev/null 2>&1 || true
+# Upgrade from last version (don't ignore failures)
+ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/upgrade_tables_4_7_0+.sql
+ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
+	< $install_dir/sql/upgrade_tables_4_7_0+.sql
 
-	# Upgrade from last version (don't ignore failures)
-	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/upgrade_tables_4_7_0+.sql
-	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
-		< $install_dir/sql/upgrade_tables_4_7_0+.sql
-
-	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/create_tables.sql
-	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
-		< $install_dir/sql/create_tables.sql
-fi
+ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/create_tables.sql
+ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
+	< $install_dir/sql/create_tables.sql
 
 #=================================================
 # GENERIC FINALIZATION
