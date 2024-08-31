@@ -1,106 +1,89 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# CHECK VERSION
-#=================================================
-
-upgrade_type=$(ynh_check_app_version_changed)
-
-#=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_script_progression --message="Ensuring downward compatibility..."
+ynh_script_progression "Ensuring downward compatibility..."
 
 # In older version, the admin setting was admin_user
 if [ -v admin ]; then
-	ynh_app_setting_delete --app=$app --key=admin
+	ynh_app_setting_delete --key=admin
 fi
 
 if [ -v admin_user ]; then
-	ynh_app_setting_delete --app=$app --key=admin_user
+	ynh_app_setting_delete --key=admin_user
 fi
 
 # If db_admin_user doesn't exist, create it
 if [ -z "$db_admin_user" ]; then
 	# Setup a privileged user for phpmyadmin (to prevent using MySQL root user)
 	db_admin_user="${app}_root"
-	ynh_app_setting_set --app=$app --key=db_admin_user --value=$db_admin_user
+	ynh_app_setting_set --key=db_admin_user --value=$db_admin_user
 	db_admin_pwd="$(ynh_string_random)"
-	ynh_app_setting_set --app=$app --key=db_admin_pwd --value=$db_admin_pwd
+	ynh_app_setting_set --key=db_admin_pwd --value=$db_admin_pwd
 
 	if ! ynh_mysql_user_exists --user=$db_admin_user
 	then
 	  ynh_mysql_create_user $db_admin_user "$db_admin_pwd"
-	  ynh_mysql_execute_as_root --sql="GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION; FLUSH PRIVILEGES;" --database=mysql
+	  ynh_mysql_db_shell <<< "GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION; FLUSH PRIVILEGES;" --database=mysql
 	fi
 fi
 
 #=================================================
-# STANDARD UPGRADE STEPS
-#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
+# FIXME: this is still supported but the recommendation is now to *always* re-setup the app sources wether or not the upstream sources changed
+if ynh_app_upstream_version_changed
 then
-	ynh_script_progression --message="Upgrading source files..." --weight=5
+	ynh_script_progression "Upgrading source files..."
 
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$install_dir" --keep="config.inc.php" --full_replace=1
+	ynh_setup_source --dest_dir="$install_dir" --keep="config.inc.php" --full_replace
 fi
 
-chmod 750 "$install_dir"
-chmod -R o-rwx "$install_dir"
-chown -R $app:www-data "$install_dir"
-
+#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod 750 "$install_dir"
+#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod -R o-rwx "$install_dir"
+#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app:www-data "$install_dir"
 #=================================================
 # REAPPLY SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Upgrading system configurations related to $app..." --weight=1
+ynh_script_progression "Upgrading system configurations related to $app..."
 
 # Create a dedicated NGINX config
-ynh_add_nginx_config
+ynh_config_add_nginx
 
 # Create a dedicated PHP-FPM config
-ynh_add_fpm_config
+ynh_config_add_phpfpm
 
-#=================================================
-# SPECIFIC UPGRADE
 #=================================================
 # UPGRADE THE DATABASE
 #=================================================
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
+# FIXME: this is still supported but the recommendation is now to *always* re-setup the app sources wether or not the upstream sources changed
+if ynh_app_upstream_version_changed
 then
-	ynh_script_progression --message="Upgrading database..." --weight=2
+	ynh_script_progression "Upgrading database..."
 
 	# Handle upgrade from a version before latest version
 	# Ignore warnings and failures that will occur if already on latest version
-	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/upgrade_column_info_4_3_0+.sql
-	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
+	ynh_replace --match="phpmyadmin" --replace="$db_name" --file=$install_dir/sql/upgrade_column_info_4_3_0+.sql
+	ynh_mysql_db_shell \
 		< $install_dir/sql/upgrade_column_info_4_3_0+.sql > /dev/null 2>&1 || true
 
 	# Upgrade from last version (don't ignore failures)
-	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/upgrade_tables_4_7_0+.sql
-	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
+	ynh_replace --match="phpmyadmin" --replace="$db_name" --file=$install_dir/sql/upgrade_tables_4_7_0+.sql
+	ynh_mysql_db_shell \
 		< $install_dir/sql/upgrade_tables_4_7_0+.sql
 
-	ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/create_tables.sql
-	ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
+	ynh_replace --match="phpmyadmin" --replace="$db_name" --file=$install_dir/sql/create_tables.sql
+	ynh_mysql_db_shell \
 		< $install_dir/sql/create_tables.sql
 fi
 
-#=================================================
-# GENERIC FINALIZATION
 #=================================================
 # SECURE FILES AND DIRECTORIES
 #=================================================
@@ -113,4 +96,4 @@ chown -R $app: $install_dir/tmp
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --last
+ynh_script_progression "Upgrade of $app completed"
