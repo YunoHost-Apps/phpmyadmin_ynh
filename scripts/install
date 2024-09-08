@@ -1,78 +1,62 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
-#=================================================
-# STANDARD MODIFICATIONS
 #=================================================
 # CREATE A MYSQL SUPERUSER
 #=================================================
 
 # Setup a privileged user for phpmyadmin (to prevent using MySQL root user)
 db_admin_user="${app}_root"
-ynh_app_setting_set --app=$app --key=db_admin_user --value=$db_admin_user
+ynh_app_setting_set --key=db_admin_user --value=$db_admin_user
 db_admin_pwd="$(ynh_string_random)"
-ynh_app_setting_set --app=$app --key=db_admin_pwd --value=$db_admin_pwd
+ynh_app_setting_set --key=db_admin_pwd --value=$db_admin_pwd
 
 if ! ynh_mysql_user_exists --user=$db_admin_user
 then
   ynh_mysql_create_user $db_admin_user "$db_admin_pwd"
-  ynh_mysql_execute_as_root --sql="GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION; FLUSH PRIVILEGES;" --database=mysql
+  ynh_mysql_db_shell <<< "GRANT ALL PRIVILEGES ON *.* TO '$db_admin_user'@'localhost' IDENTIFIED BY '$db_admin_pwd' WITH GRANT OPTION; FLUSH PRIVILEGES;" --database=mysql
 fi
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Setting up source files..." --weight=6
+ynh_script_progression "Setting up source files..."
 
-# Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
 
-chmod 750 "$install_dir"
-chmod -R o-rwx "$install_dir"
-chown -R $app:www-data "$install_dir"
+#chmod 750 "$install_dir"
+#chmod -R o-rwx "$install_dir"
+#chown -R $app:www-data "$install_dir"
 
 #=================================================
 # SYSTEM CONFIGURATION
 #=================================================
-ynh_script_progression --message="Adding system configurations related to $app..." --weight=1
+ynh_script_progression "Adding system configurations related to $app..."
 
-# Create a dedicated NGINX config
-ynh_add_nginx_config
+ynh_config_add_nginx
 
-# Create a dedicated PHP-FPM config
-ynh_add_fpm_config
+ynh_config_add_phpfpm
 
-#=================================================
-# SPECIFIC SETUP
 #=================================================
 # POPULATE THE DATABASE
 #=================================================
-ynh_script_progression --message="Filling database..." --weight=3
+ynh_script_progression "Filling database..."
 
-ynh_replace_string --match_string="phpmyadmin" --replace_string="$db_name" --target_file=$install_dir/sql/create_tables.sql
-ynh_mysql_connect_as --user="$db_name" --password="$db_pwd" --database="$db_name" \
-    < $install_dir/sql/create_tables.sql
+ynh_replace --match="phpmyadmin" --replace="$db_name" --file=$install_dir/sql/create_tables.sql
+ynh_mysql_db_shell < $install_dir/sql/create_tables.sql
 
 #=================================================
 # CONFIGURE PHPMYADMIN
 #=================================================
-ynh_script_progression --message="Configuring $app..."
+ynh_script_progression "Configuring $app..."
 
-ynh_add_config --template="../conf/config.inc.php" --destination="$install_dir/config.inc.php"
+ynh_config_add --template="config.inc.php" --destination="$install_dir/config.inc.php"
 # config.inc.php contains sensitive data, restrict its access
 chown $app: $install_dir/config.inc.php
 chmod 640 $install_dir/config.inc.php
 
-#=================================================
-# GENERIC FINALIZATION
 #=================================================
 # SECURE FILES AND DIRECTORIES
 #=================================================
@@ -85,4 +69,4 @@ chown $app: $install_dir/tmp
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Installation of $app completed" --last
+ynh_script_progression "Installation of $app completed"
