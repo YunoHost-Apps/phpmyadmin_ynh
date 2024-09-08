@@ -24,33 +24,28 @@ fi
 #=================================================
 ynh_script_progression "Setting up source files..."
 
-# Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
 
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod 750 "$install_dir"
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod -R o-rwx "$install_dir"
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app:www-data "$install_dir"
+#chmod 750 "$install_dir"
+#chmod -R o-rwx "$install_dir"
+#chown -R $app:www-data "$install_dir"
+
 #=================================================
 # SYSTEM CONFIGURATION
 #=================================================
 ynh_script_progression "Adding system configurations related to $app..."
 
-# Create a dedicated NGINX config
 ynh_config_add_nginx
 
-# Create a dedicated PHP-FPM config
 ynh_config_add_phpfpm
 
-#=================================================
-# SPECIFIC SETUP
 #=================================================
 # POPULATE THE DATABASE
 #=================================================
 ynh_script_progression "Filling database..."
 
 ynh_replace --match="phpmyadmin" --replace="$db_name" --file=$install_dir/sql/create_tables.sql
-ynh_mysql_db_shell \
-    < $install_dir/sql/create_tables.sql
+ynh_mysql_db_shell < $install_dir/sql/create_tables.sql
 
 #=================================================
 # CONFIGURE PHPMYADMIN
@@ -59,8 +54,8 @@ ynh_script_progression "Configuring $app..."
 
 ynh_config_add --template="config.inc.php" --destination="$install_dir/config.inc.php"
 # config.inc.php contains sensitive data, restrict its access
-#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown $app: $install_dir/config.inc.php
-#REMOVEME? Assuming the file is setup using ynh_config_add, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod 640 $install_dir/config.inc.php
+chown $app: $install_dir/config.inc.php
+chmod 640 $install_dir/config.inc.php
 
 #=================================================
 # SECURE FILES AND DIRECTORIES

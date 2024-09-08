@@ -35,54 +35,39 @@ fi
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
+ynh_script_progression "Upgrading source files..."
 
-# FIXME: this is still supported but the recommendation is now to *always* re-setup the app sources wether or not the upstream sources changed
-if ynh_app_upstream_version_changed
-then
-	ynh_script_progression "Upgrading source files..."
+ynh_setup_source --dest_dir="$install_dir" --keep="config.inc.php" --full_replace
 
-	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$install_dir" --keep="config.inc.php" --full_replace
-fi
+#chmod 750 "$install_dir"
+#chmod -R o-rwx "$install_dir"
+#chown -R $app:www-data "$install_dir"
 
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod 750 "$install_dir"
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod -R o-rwx "$install_dir"
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app:www-data "$install_dir"
 #=================================================
 # REAPPLY SYSTEM CONFIGURATIONS
 #=================================================
 ynh_script_progression "Upgrading system configurations related to $app..."
 
-# Create a dedicated NGINX config
 ynh_config_add_nginx
 
-# Create a dedicated PHP-FPM config
 ynh_config_add_phpfpm
 
 #=================================================
 # UPGRADE THE DATABASE
 #=================================================
+ynh_script_progression "Upgrading database..."
 
-# FIXME: this is still supported but the recommendation is now to *always* re-setup the app sources wether or not the upstream sources changed
-if ynh_app_upstream_version_changed
-then
-	ynh_script_progression "Upgrading database..."
+# Handle upgrade from a version before latest version
+# Ignore warnings and failures that will occur if already on latest version
+ynh_replace --match="phpmyadmin" --replace="$db_name" --file=$install_dir/sql/upgrade_column_info_4_3_0+.sql
+ynh_mysql_db_shell < $install_dir/sql/upgrade_column_info_4_3_0+.sql > /dev/null 2>&1 || true
 
-	# Handle upgrade from a version before latest version
-	# Ignore warnings and failures that will occur if already on latest version
-	ynh_replace --match="phpmyadmin" --replace="$db_name" --file=$install_dir/sql/upgrade_column_info_4_3_0+.sql
-	ynh_mysql_db_shell \
-		< $install_dir/sql/upgrade_column_info_4_3_0+.sql > /dev/null 2>&1 || true
+# Upgrade from last version (don't ignore failures)
+ynh_replace --match="phpmyadmin" --replace="$db_name" --file=$install_dir/sql/upgrade_tables_4_7_0+.sql
+ynh_mysql_db_shell < $install_dir/sql/upgrade_tables_4_7_0+.sql
 
-	# Upgrade from last version (don't ignore failures)
-	ynh_replace --match="phpmyadmin" --replace="$db_name" --file=$install_dir/sql/upgrade_tables_4_7_0+.sql
-	ynh_mysql_db_shell \
-		< $install_dir/sql/upgrade_tables_4_7_0+.sql
-
-	ynh_replace --match="phpmyadmin" --replace="$db_name" --file=$install_dir/sql/create_tables.sql
-	ynh_mysql_db_shell \
-		< $install_dir/sql/create_tables.sql
-fi
+ynh_replace --match="phpmyadmin" --replace="$db_name" --file=$install_dir/sql/create_tables.sql
+ynh_mysql_db_shell < $install_dir/sql/create_tables.sql
 
 #=================================================
 # SECURE FILES AND DIRECTORIES

@@ -10,9 +10,10 @@ ynh_script_progression "Restoring phpMyAdmin main directory..."
 
 ynh_restore "$install_dir"
 
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod 750 "$install_dir"
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod -R o-rwx "$install_dir"
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app:www-data "$install_dir"
+#chmod 750 "$install_dir"
+#chmod -R o-rwx "$install_dir"
+#chown -R $app:www-data "$install_dir"
+
 #=================================================
 # RESTORE THE MYSQL DATABASE
 #=================================================
@@ -36,16 +37,12 @@ chown $app: $install_dir/tmp
 #=================================================
 # RESTORE SYSTEM CONFIGURATIONS
 #=================================================
-# RESTORE THE PHP-FPM CONFIGURATION
-#=================================================
 ynh_script_progression "Restoring system configurations related to $app..."
 
-# Restore the file first, so it can have a backup if different
 ynh_restore "/etc/php/$php_version/fpm/pool.d/$app.conf"
 
 ynh_restore "/etc/nginx/conf.d/$domain.d/$app.conf"
 
-# Recreate a dedicated php-fpm config
 ynh_config_add_phpfpm
 
 #=================================================
