@@ -10,6 +10,7 @@ source /usr/share/yunohost/helpers
 # Setup a privileged user for phpmyadmin (to prevent using MySQL root user)
 db_admin_user="${app}_root"
 ynh_app_setting_set --key=db_admin_user --value=$db_admin_user
+
 db_admin_pwd="$(ynh_string_random)"
 ynh_app_setting_set --key=db_admin_pwd --value=$db_admin_pwd
 
@@ -25,10 +26,6 @@ fi
 ynh_script_progression "Setting up source files..."
 
 ynh_setup_source --dest_dir="$install_dir"
-
-#chmod 750 "$install_dir"
-#chmod -R o-rwx "$install_dir"
-#chown -R $app:www-data "$install_dir"
 
 #=================================================
 # SYSTEM CONFIGURATION
