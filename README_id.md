@@ -5,7 +5,9 @@ Ini TIDAK boleh diedit dengan tangan.
 
 # phpMyAdmin untuk YunoHost
 
-[![Tingkat integrasi](https://dash.yunohost.org/integration/phpmyadmin.svg)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/) ![Status kerja](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.status.svg) ![Status pemeliharaan](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.maintain.svg)
+[![Tingkat integrasi](https://apps.yunohost.org/badge/integration/phpmyadmin)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
+![Status kerja](https://apps.yunohost.org/badge/state/phpmyadmin)
+![Status pemeliharaan](https://apps.yunohost.org/badge/maintained/phpmyadmin)
 
 [![Pasang phpMyAdmin dengan YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=phpmyadmin)
 

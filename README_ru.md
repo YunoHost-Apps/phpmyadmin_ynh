@@ -5,7 +5,9 @@
 
 # phpMyAdmin для YunoHost
 
-[![Уровень интеграции](https://dash.yunohost.org/integration/phpmyadmin.svg)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/) ![Состояние работы](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.status.svg) ![Состояние сопровождения](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.maintain.svg)
+[![Уровень интеграции](https://apps.yunohost.org/badge/integration/phpmyadmin)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
+![Состояние работы](https://apps.yunohost.org/badge/state/phpmyadmin)
+![Состояние сопровождения](https://apps.yunohost.org/badge/maintained/phpmyadmin)
 
 [![Установите phpMyAdmin с YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=phpmyadmin)
 

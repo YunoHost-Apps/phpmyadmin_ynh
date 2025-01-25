@@ -5,7 +5,9 @@
 
 # YunoHost 上的 phpMyAdmin
 
-[![集成程度](https://dash.yunohost.org/integration/phpmyadmin.svg)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/) ![工作状态](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.maintain.svg)
+[![集成程度](https://apps.yunohost.org/badge/integration/phpmyadmin)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
+![工作状态](https://apps.yunohost.org/badge/state/phpmyadmin)
+![维护状态](https://apps.yunohost.org/badge/maintained/phpmyadmin)
 
 [![使用 YunoHost 安装 phpMyAdmin](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=phpmyadmin)
 

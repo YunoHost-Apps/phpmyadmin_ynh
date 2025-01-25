@@ -5,7 +5,9 @@ It shall NOT be edited by hand.
 
 # phpMyAdmin for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/phpmyadmin.svg)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/) ![Working status](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.maintain.svg)
+[![Integration level](https://apps.yunohost.org/badge/integration/phpmyadmin)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
+![Working status](https://apps.yunohost.org/badge/state/phpmyadmin)
+![Maintenance status](https://apps.yunohost.org/badge/maintained/phpmyadmin)
 
 [![Install phpMyAdmin with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=phpmyadmin)
 
