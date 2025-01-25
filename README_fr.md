@@ -20,7 +20,7 @@ Il NE doit PAS être modifié à la main.
 
 phpMyAdmin est un outil logiciel libre écrit en PHP, destiné à gérer l'administration de MySQL sur le Web. phpMyAdmin prend en charge un large éventail d'opérations sur MySQL et MariaDB. Les opérations fréquemment utilisées (gestion des bases de données, des tables, des colonnes, des relations, des index, des utilisateurs, des autorisations, etc.) peuvent être effectuées via l'interface utilisateur, tandis que vous avez toujours la possibilité d'exécuter directement les instructions SQL.
 
-**Version incluse :** 5.2.1~ynh1
+**Version incluse :** 5.2.2~ynh1
 
 **Démo :** <https://demo.phpmyadmin.net/master-config>
 
