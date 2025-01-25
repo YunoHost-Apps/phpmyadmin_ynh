@@ -5,7 +5,9 @@ EZ editatu eskuz.
 
 # phpMyAdmin YunoHost-erako
 
-[![Integrazio maila](https://dash.yunohost.org/integration/phpmyadmin.svg)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/phpmyadmin.maintain.svg)
+[![Integrazio maila](https://apps.yunohost.org/badge/integration/phpmyadmin)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
+![Funtzionamendu egoera](https://apps.yunohost.org/badge/state/phpmyadmin)
+![Mantentze egoera](https://apps.yunohost.org/badge/maintained/phpmyadmin)
 
 [![Instalatu phpMyAdmin YunoHost-ekin](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=phpmyadmin)
 
