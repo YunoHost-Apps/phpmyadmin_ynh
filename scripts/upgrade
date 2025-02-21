@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
 source _common.sh
 source /usr/share/yunohost/helpers
 
@@ -37,6 +41,7 @@ fi
 #=================================================
 ynh_script_progression "Upgrading source files..."
 
+# Download, check integrity, uncompress and patch the source from manifest.toml
 ynh_setup_source --dest_dir="$install_dir" --keep="config.inc.php" --full_replace
 
 #=================================================
@@ -44,9 +49,9 @@ ynh_setup_source --dest_dir="$install_dir" --keep="config.inc.php" --full_replac
 #=================================================
 ynh_script_progression "Upgrading system configurations related to $app..."
 
-ynh_config_add_nginx
-
 ynh_config_add_phpfpm
+
+ynh_config_add_nginx
 
 #=================================================
 # UPGRADE THE DATABASE
