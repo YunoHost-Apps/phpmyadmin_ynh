@@ -47,7 +47,9 @@ ram.runtime = "50M"
     [resources.sources.main]
     url = "https://files.phpmyadmin.net/phpMyAdmin/5.2.2/phpMyAdmin-5.2.2-all-languages.tar.gz"
     sha256 = "8551c8bf3b166f232d5cf64bac877472e9d0cb8f2fe1858fab24f975e7d765b6"
-    autoupdate.strategy = "latest_github_release"
+
+    # Autoupdater can't work for files hosted on custom sites
+    #autoupdate.strategy = "latest_github_release"
 
     [resources.system_user]
 
