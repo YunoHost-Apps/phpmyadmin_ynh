@@ -4,7 +4,7 @@ It shall NOT be edited by hand.
 -->
 
 <h1>
-  <img src="https://raw.githubusercontent.com/YunoHost/apps/master/logos/phpmyadmin.png" width="32px" alt="Logo of phpMyAdmin">
+  <img src="https://raw.githubusercontent.com/YunoHost/apps/main/logos/phpmyadmin.png" width="32px" alt="Logo of phpMyAdmin">
   phpMyAdmin, packaged for YunoHost
 </h1>
 
@@ -12,7 +12,7 @@ Manage MySQL and MariaDB databases over the web
 
 [![🌐 Official app website](https://img.shields.io/badge/Official_app_website-darkgreen?style=for-the-badge)](http://www.phpmyadmin.net)
 [![App Demo](https://img.shields.io/badge/App_Demo-blue?style=for-the-badge)](https://demo.phpmyadmin.net/master-config)
-![Version: 5.2.2~ynh1](https://img.shields.io/badge/Version-5.2.2~ynh1-rgba(0,150,0,1)?style=for-the-badge)
+[![Version: 5.2.2~ynh1](https://img.shields.io/badge/Version-5.2.2~ynh1-rgba(0,150,0,1)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
 
 <div align="center">
 <a href="https://apps.yunohost.org/app/phpmyadmin"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
@@ -20,6 +20,8 @@ Manage MySQL and MariaDB databases over the web
 </div>
 
 ## 📦 Developer info
+
+[![Automatic tests level](https://apps.yunohost.org/badge/cilevel/phpmyadmin)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
 
 🛠️ Upstream phpMyAdmin repository: <https://github.com/phpmyadmin/phpmyadmin>
 
