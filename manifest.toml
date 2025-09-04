@@ -22,13 +22,12 @@ cpe = "cpe:2.3:a:phpmyadmin:phpmyadmin"
 fund = "https://www.phpmyadmin.net/donate/"
 
 [integration]
-yunohost = ">= 12.0.9"
+yunohost = ">= 12.1.17"
 helpers_version = "2.1"
 architectures = "all"
 multi_instance = false
 
 ldap = true
-
 sso = true
 
 disk = "100M"
