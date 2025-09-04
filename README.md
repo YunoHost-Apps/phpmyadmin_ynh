@@ -12,12 +12,16 @@ Manage MySQL and MariaDB databases over the web
 
 [![🌐 Official app website](https://img.shields.io/badge/Official_app_website-darkgreen?style=for-the-badge)](http://www.phpmyadmin.net)
 [![App Demo](https://img.shields.io/badge/App_Demo-blue?style=for-the-badge)](https://demo.phpmyadmin.net/master-config)
-[![Version: 5.2.2~ynh1](https://img.shields.io/badge/Version-5.2.2~ynh1-rgba(0,150,0,1)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
+[![Version: 5.2.2~ynh1](https://img.shields.io/badge/Version-5.2.2~ynh1-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
 
 <div align="center">
 <a href="https://apps.yunohost.org/app/phpmyadmin"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
 <a href="https://github.com/YunoHost-Apps/phpmyadmin_ynh/issues"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_report_an_issue.svg"/></a>
 </div>
+
+
+## Screenshots
+![Screenshot of phpMyAdmin](./doc/screenshots/68747470733a2f2f7777772e7068706d7961646d696e2e6e65742f7374617469632f696d616765732f73637265656e73686f74732f7374727563747572652e706e67.png)
 
 ## 📦 Developer info
 
