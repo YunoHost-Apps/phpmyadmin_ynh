@@ -7,7 +7,7 @@ name = "phpMyAdmin"
 description.en = "Manage MySQL and MariaDB databases over the web"
 description.fr = "Application web de gestion des bases de données MySQL et MariaDB"
 
-version = "5.2.2~ynh1"
+version = "5.2.3~ynh1"
 
 maintainers = ["julien"]
 
@@ -22,13 +22,12 @@ cpe = "cpe:2.3:a:phpmyadmin:phpmyadmin"
 fund = "https://www.phpmyadmin.net/donate/"
 
 [integration]
-yunohost = ">= 12.0.9"
+yunohost = ">= 12.1.17"
 helpers_version = "2.1"
 architectures = "all"
 multi_instance = false
 
 ldap = true
-
 sso = true
 
 disk = "100M"
@@ -45,9 +44,11 @@ ram.runtime = "50M"
 
 [resources]
     [resources.sources.main]
-    url = "https://files.phpmyadmin.net/phpMyAdmin/5.2.2/phpMyAdmin-5.2.2-all-languages.tar.gz"
-    sha256 = "8551c8bf3b166f232d5cf64bac877472e9d0cb8f2fe1858fab24f975e7d765b6"
-    autoupdate.strategy = "latest_github_release"
+    url = "https://files.phpmyadmin.net/phpMyAdmin/5.2.3/phpMyAdmin-5.2.3-all-languages.tar.gz"
+    sha256 = "12ba1c425fa4071abbd4e7668c9ebdeac0b0755a467a6d6d5026122bb47c102b"
+
+    # Autoupdater can't work for files hosted on custom sites
+    #autoupdate.strategy = "latest_github_release"
 
     [resources.system_user]
 
