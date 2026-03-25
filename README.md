@@ -8,7 +8,7 @@ It shall NOT be edited by hand.
   phpMyAdmin, packaged for YunoHost
 </h1>
 
-Manage MySQL and MariaDB databases over the web
+Manage MySQL and MariaDB databases
 
 [![🌐 Official app website](https://img.shields.io/badge/Official_app_website-darkgreen?style=for-the-badge)](http://www.phpmyadmin.net)
 [![App Demo](https://img.shields.io/badge/App_Demo-blue?style=for-the-badge)](https://demo.phpmyadmin.net/master-config)
