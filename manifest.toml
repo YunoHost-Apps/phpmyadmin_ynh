@@ -7,7 +7,7 @@ name = "phpMyAdmin"
 description.en = "Manage MySQL and MariaDB databases"
 description.fr = "Gestion des bases de données MySQL et MariaDB"
 
-version = "5.2.3~ynh1"
+version = "5.2.3~ynh2"
 
 maintainers = ["julien"]
 
