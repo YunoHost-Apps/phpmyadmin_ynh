@@ -4,10 +4,10 @@ packaging_format = 2
 
 id = "phpmyadmin"
 name = "phpMyAdmin"
-description.en = "Manage MySQL and MariaDB databases over the web"
-description.fr = "Application web de gestion des bases de données MySQL et MariaDB"
+description.en = "Manage MySQL and MariaDB databases"
+description.fr = "Gestion des bases de données MySQL et MariaDB"
 
-version = "5.2.3~ynh1"
+version = "5.2.3~ynh2"
 
 maintainers = ["julien"]
 
@@ -18,11 +18,10 @@ demo = "https://demo.phpmyadmin.net/master-config"
 admindoc = "https://www.phpmyadmin.net/docs/"
 code = "https://github.com/phpmyadmin/phpmyadmin"
 cpe = "cpe:2.3:a:phpmyadmin:phpmyadmin"
-
 fund = "https://www.phpmyadmin.net/donate/"
 
 [integration]
-yunohost = ">= 12.1.17"
+yunohost = ">= 12.1.39"
 helpers_version = "2.1"
 architectures = "all"
 multi_instance = false
@@ -60,7 +59,7 @@ ram.runtime = "50M"
     main.allowed = "admins"
 
     [resources.apt]
-    packages = "mariadb-server php8.3-xml, php8.3-curl, php8.3-zip, php8.3-mysql, php8.3-mbstring"
+    packages = "mariadb-server php8.4-xml, php8.4-curl, php8.4-zip, php8.4-mysql, php8.4-mbstring"
 
     [resources.database]
     type = "mysql"

@@ -8,11 +8,11 @@ It shall NOT be edited by hand.
   phpMyAdmin, packaged for YunoHost
 </h1>
 
-Manage MySQL and MariaDB databases over the web
+Manage MySQL and MariaDB databases
 
 [![🌐 Official app website](https://img.shields.io/badge/Official_app_website-darkgreen?style=for-the-badge)](http://www.phpmyadmin.net)
 [![App Demo](https://img.shields.io/badge/App_Demo-blue?style=for-the-badge)](https://demo.phpmyadmin.net/master-config)
-[![Version: 5.2.3~ynh1](https://img.shields.io/badge/Version-5.2.3~ynh1-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
+[![Version: 5.2.3~ynh2](https://img.shields.io/badge/Version-5.2.3~ynh2-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/phpmyadmin/)
 
 <div align="center">
 <a href="https://apps.yunohost.org/app/phpmyadmin"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
